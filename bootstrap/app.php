@@ -34,6 +34,11 @@ if (isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL_URL'])) {
         mkdir($tmpStorage . '/app', 0777, true);
     }
     
+    $tmpBootstrap = '/tmp/bootstrap/cache';
+    if (!is_dir($tmpBootstrap)) {
+        mkdir($tmpBootstrap, 0777, true);
+    }
+    
     $app->useStoragePath($tmpStorage);
     $app->useBootstrapPath('/tmp/bootstrap');
 }

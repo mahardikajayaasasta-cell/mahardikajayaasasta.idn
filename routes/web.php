@@ -17,6 +17,19 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
+// =============================================
+// Remote Database Setup (Khusus Vercel)
+// =============================================
+Route::get('/setup-db', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        return "Database berhasil di-migrate & di-seed! <a href='/'>Klik di sini untuk Login</a>";
+    } catch (\Exception $e) {
+        return "Error saat menjalankan setup: " . $e->getMessage();
+    }
+});
+
 // Auth routes (Laravel Breeze)
 require __DIR__.'/auth.php';
 

@@ -8,6 +8,19 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
 // =============================================
+// Self-Healing Migration (Otomatis Setup DB)
+// =============================================
+try {
+    // Hanya jalan jika tabel users belum ada (tandanya database kosong)
+    if (!\Illuminate\Support\Facades\Schema::hasTable('users')) {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+    }
+} catch (\Exception $e) {
+    // Abaikan error saat booting, biarkan Laravel yang menangani jika koneksi benar-benar mati
+}
+
+// =============================================
 // Public Routes
 // =============================================
 Route::get('/', function () {

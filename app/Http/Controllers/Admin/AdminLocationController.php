@@ -7,7 +7,7 @@ use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
-class AdminLocationController extends Controller
+class AdminLocationController
 {
     public function index()
     {

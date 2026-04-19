@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Carbon;
 
-class AdminAttendanceController extends Controller
+class AdminAttendanceController
 {
     /**
      * Dashboard Admin

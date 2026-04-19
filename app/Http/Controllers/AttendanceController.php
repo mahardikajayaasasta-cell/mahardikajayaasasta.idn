@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Support\Carbon;
 
-class AttendanceController extends Controller
+class AttendanceController
 {
     /**
      * Halaman absensi karyawan

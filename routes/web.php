@@ -7,6 +7,11 @@ use App\Http\Controllers\Admin\AdminLocationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
+// PENTING: Bypass session database untuk route setup-db agar tidak error "sessions table not found"
+if (request()->is('setup-db')) {
+    config(['session.driver' => 'array']);
+}
+
 // =============================================
 // Public Routes
 // =============================================

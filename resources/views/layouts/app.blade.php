@@ -8,7 +8,7 @@
     <meta name="description" content="Sistem Absensi Berbasis Web dengan GPS dan Kamera">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800&display=swap" rel="stylesheet" />
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <script src="https://cdn.tailwindcss.com"></script>
     @stack('head')
 </head>
 <body class="h-full bg-slate-50 font-['Inter']">
@@ -155,7 +155,7 @@
     </div>
 </div>
 
-<style>
+<style type="text/tailwindcss">
 .nav-link {
     @apply flex items-center gap-3 px-3 py-2 rounded-xl text-sm text-slate-400 hover:text-white hover:bg-white/10 transition-all duration-200 font-medium;
 }

@@ -6,7 +6,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Middleware\KaryawanMiddleware;
 
-return Application::configure(basePath: dirname(__DIR__))
+$app = Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
@@ -21,3 +21,21 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();
+
+// Fix environment paths for Vercel (Read-Only Filesystem)
+if (isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL_URL'])) {
+    $tmpStorage = '/tmp/storage';
+    if (!is_dir($tmpStorage)) {
+        mkdir($tmpStorage . '/framework/cache/data', 0777, true);
+        mkdir($tmpStorage . '/framework/sessions', 0777, true);
+        mkdir($tmpStorage . '/framework/testing', 0777, true);
+        mkdir($tmpStorage . '/framework/views', 0777, true);
+        mkdir($tmpStorage . '/logs', 0777, true);
+        mkdir($tmpStorage . '/app', 0777, true);
+    }
+    
+    $app->useStoragePath($tmpStorage);
+    $app->useBootstrapPath('/tmp/bootstrap');
+}
+
+return $app;

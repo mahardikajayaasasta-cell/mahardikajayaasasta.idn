@@ -2,6 +2,15 @@
 
 // Vercel PHP Runtime entry point untuk Laravel
 $url = $_SERVER['REQUEST_URI'] ?? '/';
+
+// PENTING: Jika path adalah /setup-db, kita GANTI session driver sementara menjadi array
+// agar Laravel tidak crash karena mencari table 'sessions' yang belum ada.
+if (strpos($url, '/setup-db') !== false) {
+    putenv('SESSION_DRIVER=array');
+    $_ENV['SESSION_DRIVER'] = 'array';
+    $_SERVER['SESSION_DRIVER'] = 'array';
+}
+
 $publicPath = __DIR__ . '/../public';
 $filePath = $publicPath . parse_url($url, PHP_URL_PATH);
 

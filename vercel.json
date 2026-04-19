@@ -36,6 +36,7 @@
     "env": {
         "APP_ENV": "production",
         "APP_DEBUG": "true",
+        "APP_KEY": "base64:UzO1P98W4lU+j66hH+hO5Ww0Q5hBzU2Y5Pqk5l5T8Wc=",
         "LOG_CHANNEL": "stderr",
         "LOG_LEVEL": "error",
         "DB_CONNECTION": "mysql"

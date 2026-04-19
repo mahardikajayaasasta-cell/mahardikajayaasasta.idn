@@ -7,17 +7,12 @@ use App\Http\Controllers\Admin\AdminLocationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
-// PENTING: Bypass session database untuk route setup-db agar tidak error "sessions table not found"
-if (request()->is('setup-db')) {
-    config(['session.driver' => 'array']);
-}
-
 // =============================================
 // Public Routes
 // =============================================
 Route::get('/', function () {
-    if (Auth::check()) {
-        return redirect(Auth::user()->isAdmin() ? '/admin/dashboard' : '/karyawan/dashboard');
+    if (\Illuminate\Support\Facades\Auth::check()) {
+        return redirect(\Illuminate\Support\Facades\Auth::user()->isAdmin() ? '/admin/dashboard' : '/karyawan/dashboard');
     }
     return redirect('/login');
 });
@@ -33,7 +28,7 @@ Route::get('/setup-db', function () {
     } catch (\Exception $e) {
         return "Error saat menjalankan setup: " . $e->getMessage();
     }
-});
+})->withoutMiddleware([\Illuminate\Session\Middleware\StartSession::class]);
 
 // Auth routes (Laravel Breeze)
 require __DIR__.'/auth.php';

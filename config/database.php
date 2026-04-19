@@ -56,9 +56,20 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'strict' => true,
-            'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA', isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL']) ? '/etc/pki/tls/certs/ca-bundle.crt' : null),
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA', (function() {
+                    $paths = [
+                        '/etc/ssl/certs/ca-certificates.crt', // Debian/Ubuntu/Alpine
+                        '/etc/pki/tls/certs/ca-bundle.crt',   // AmazonLinux/CentOS
+                        '/etc/ssl/ca-bundle.pem',             // SUSE
+                        '/etc/ssl/cert.pem',                  // macOS
+                    ];
+                    foreach ($paths as $path) {
+                        if (file_exists($path)) return $path;
+                    }
+                    return null;
+                })()),
+                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
             ]) : [],
         ],
 
@@ -76,9 +87,20 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'strict' => true,
-            'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA', isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL']) ? '/etc/pki/tls/certs/ca-bundle.crt' : null),
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA', (function() {
+                    $paths = [
+                        '/etc/ssl/certs/ca-certificates.crt', // Debian/Ubuntu/Alpine
+                        '/etc/pki/tls/certs/ca-bundle.crt',   // AmazonLinux/CentOS
+                        '/etc/ssl/ca-bundle.pem',             // SUSE
+                        '/etc/ssl/cert.pem',                  // macOS
+                    ];
+                    foreach ($paths as $path) {
+                        if (file_exists($path)) return $path;
+                    }
+                    return null;
+                })()),
+                PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
             ]) : [],
         ],
 

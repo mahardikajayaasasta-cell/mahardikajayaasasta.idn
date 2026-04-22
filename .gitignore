@@ -21,3 +21,10 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Project Local Helpers
+composer.bat
+composer.phar
+php83.bat
+/bootstrap/cache/*
+!/bootstrap/cache/.gitignore

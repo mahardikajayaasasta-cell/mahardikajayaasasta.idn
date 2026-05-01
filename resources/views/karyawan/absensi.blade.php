@@ -181,9 +181,6 @@ function haversineJS(lat1, lon1, lat2, lon2) {
 
 // Camera & GPS Init
 document.getElementById('btn-start-camera').addEventListener('click', async () => {
-    // Jalankan GPS secara paralel, tidak menunggu kamera
-    initGPS();
-
     try {
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
             throw new Error("Browser atau perangkat Anda tidak mendukung akses kamera.");
@@ -209,6 +206,10 @@ document.getElementById('btn-start-camera').addEventListener('click', async () =
         document.getElementById('btn-capture').disabled = false;
         document.getElementById('btn-start-camera').textContent = '✓ Kamera Aktif';
         document.getElementById('btn-start-camera').disabled = true;
+        
+        // PENTING: Panggil GPS SETELAH kamera sukses agar pop-up izin tidak bentrok di HP!
+        initGPS();
+        
     } catch (e) {
         let errorMsg = e.message;
         if (e.name === 'NotAllowedError' || errorMsg.includes('Permission denied')) {

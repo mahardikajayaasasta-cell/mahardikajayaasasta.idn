@@ -49,17 +49,17 @@ class AdminUserController
             ->with('success', 'Karyawan berhasil ditambahkan.');
     }
 
-    public function edit(User $user)
+    public function edit(User $karyawan)
     {
-        return view('admin.karyawan.form', ['user' => $user, 'action' => 'edit']);
+        return view('admin.karyawan.form', ['user' => $karyawan, 'action' => 'edit']);
     }
 
-    public function update(Request $request, User $user)
+    public function update(Request $request, User $karyawan)
     {
         $request->validate([
             'name'        => 'required|string|max:255',
-            'email'       => ['required', 'email', Rule::unique('users')->ignore($user->id)],
-            'employee_id' => ['nullable', 'string', Rule::unique('users')->ignore($user->id)],
+            'email'       => ['required', 'email', Rule::unique('users')->ignore($karyawan->id)],
+            'employee_id' => ['nullable', 'string', Rule::unique('users')->ignore($karyawan->id)],
             'department'  => 'nullable|string|max:100',
             'position'    => 'nullable|string|max:100',
             'phone'       => 'nullable|string|max:20',
@@ -73,15 +73,15 @@ class AdminUserController
             $data['password'] = Hash::make($request->password);
         }
 
-        $user->update($data);
+        $karyawan->update($data);
 
         return redirect()->route('admin.karyawan.index')
             ->with('success', 'Data karyawan berhasil diperbarui.');
     }
 
-    public function destroy(User $user)
+    public function destroy(User $karyawan)
     {
-        $user->update(['is_active' => false]);
+        $karyawan->update(['is_active' => false]);
         return back()->with('success', 'Karyawan berhasil dinonaktifkan.');
     }
 }

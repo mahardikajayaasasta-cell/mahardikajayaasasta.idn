@@ -238,32 +238,37 @@ class AttendanceController
     private function uploadPhotoToCloudinary(string $base64Photo, int $userId, string $type): ?string
     {
         try {
-            // Pastikan string base64 memiliki prefix yang benar untuk Cloudinary
+            // Pastikan string base64 memiliki prefix yang benar
             if (!str_starts_with($base64Photo, 'data:image')) {
                 $base64Photo = 'data:image/jpeg;base64,' . $base64Photo;
             }
 
-            // Cek konfigurasi
+            // CEK: Jika Cloudinary tidak dikonfigurasi, simpan langsung ke Database (Base64)
             if (!config('cloudinary.cloud_url') && !env('CLOUDINARY_URL')) {
-                \Log::error('Cloudinary URL is missing in environment variables.');
-                return null;
+                \Log::info("Cloudinary tidak aktif. Menggunakan penyimpanan Database untuk User {$userId}.");
+                return $base64Photo; // Kembalikan string base64 untuk disimpan di DB
             }
 
-            // Upload langsung menggunakan string base64 (lebih stabil di Vercel)
-            $result = Cloudinary::upload($base64Photo, [
-                'folder'         => 'absensi/' . date('Y/m'),
-                'public_id'      => "user_{$userId}_{$type}_" . time(),
-                'transformation' => [
-                    'width'   => 800,
-                    'quality' => 'auto',
-                    'format'  => 'webp',
-                ],
-            ]);
+            // Mencoba upload ke Cloudinary
+            try {
+                $result = Cloudinary::upload($base64Photo, [
+                    'folder'         => 'absensi/' . date('Y/m'),
+                    'public_id'      => "user_{$userId}_{$type}_" . time(),
+                    'transformation' => [
+                        'width'   => 600, // Kecilkan ukuran agar hemat bandwith
+                        'quality' => 'auto',
+                        'format'  => 'webp',
+                    ],
+                ]);
+                return $result->getSecurePath();
+            } catch (\Exception $cloudinaryErr) {
+                \Log::warning("Gagal ke Cloudinary: " . $cloudinaryErr->getMessage() . ". Fallback ke Database.");
+                return $base64Photo; // Fallback ke DB jika upload gagal
+            }
 
-            return $result->getSecurePath();
         } catch (\Exception $e) {
-            \Log::error('Attendance Photo Upload Error: ' . $e->getMessage());
-            return null;
+            \Log::error('Attendance Photo Process Error: ' . $e->getMessage());
+            return $base64Photo; // Pilihan terakhir: tetap simpan base64 agar absen tidak gagal
         }
     }
 }

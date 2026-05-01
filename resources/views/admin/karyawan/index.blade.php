@@ -60,11 +60,11 @@
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-5M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
                                 </a>
                                 @if($user->is_active)
-                                <form action="{{ route('admin.karyawan.destroy', $user) }}" method="POST" onsubmit="return confirm('Nonaktifkan karyawan ini?')">
+                                <form action="{{ route('admin.karyawan.destroy', $user) }}" method="POST" class="delete-form" data-title="Nonaktifkan Karyawan?" data-confirm="Akun {{ $user->name }} tidak akan bisa login atau melakukan absensi lagi.">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Nonaktifkan">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                                     </button>
                                 </form>
                                 @else

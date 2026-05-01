@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @stack('head')
 </head>
 <body class="h-full bg-slate-50 font-['Inter']">
@@ -188,6 +189,35 @@ setTimeout(() => {
         if (el) el.style.display = 'none';
     });
 }, 4000);
+
+// Global SweetAlert2 Confirm for Deletion
+document.querySelectorAll('.delete-form').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const text = this.dataset.confirm || "Data yang dinonaktifkan tidak dapat digunakan lagi.";
+        const title = this.dataset.title || "Apakah Anda Yakin?";
+        
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#ef4444",
+            cancelButtonColor: "#64748b",
+            confirmButtonText: "Ya, Nonaktifkan!",
+            cancelButtonText: "Batal",
+            customClass: {
+                popup: 'rounded-2xl',
+                confirmButton: 'rounded-xl font-semibold px-6',
+                cancelButton: 'rounded-xl font-semibold px-6'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                this.submit();
+            }
+        });
+    });
+});
 </script>
 
 @stack('scripts')

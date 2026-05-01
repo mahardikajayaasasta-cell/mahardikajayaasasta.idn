@@ -232,43 +232,31 @@ class AttendanceController
     private function uploadPhotoToCloudinary(string $base64Photo, int $userId, string $type): ?string
     {
         try {
-            // Bersihkan header data URL jika ada
-            if (preg_match('/^data:image\/(\w+);base64,/', $base64Photo, $type)) {
-                $base64Photo = substr($base64Photo, strpos($base64Photo, ',') + 1);
+            // Pastikan string base64 memiliki prefix yang benar untuk Cloudinary
+            if (!str_starts_with($base64Photo, 'data:image')) {
+                $base64Photo = 'data:image/jpeg;base64,' . $base64Photo;
             }
 
-            $decodedPhoto = base64_decode($base64Photo);
-            if (!$decodedPhoto) {
-                throw new \Exception("Gagal melakukan decode base64 foto.");
-            }
-
-            $tmpFile = tempnam(sys_get_temp_dir(), 'abs_');
-            file_put_contents($tmpFile, $decodedPhoto);
-
-            // Cek apakah Cloudinary sudah dikonfigurasi
+            // Cek konfigurasi
             if (!config('cloudinary.cloud_url') && !env('CLOUDINARY_URL')) {
-                throw new \Exception("Konfigurasi Cloudinary belum lengkap (CLOUDINARY_URL kosong).");
+                \Log::error('Cloudinary URL is missing in environment variables.');
+                return null;
             }
 
-            $result = Cloudinary::upload($tmpFile, [
+            // Upload langsung menggunakan string base64 (lebih stabil di Vercel)
+            $result = Cloudinary::upload($base64Photo, [
                 'folder'         => 'absensi/' . date('Y/m'),
                 'public_id'      => "user_{$userId}_{$type}_" . time(),
                 'transformation' => [
                     'width'   => 800,
-                    'height'  => 800,
-                    'crop'    => 'limit',
                     'quality' => 'auto',
                     'format'  => 'webp',
                 ],
             ]);
 
-            @unlink($tmpFile);
-
             return $result->getSecurePath();
         } catch (\Exception $e) {
             \Log::error('Attendance Photo Upload Error: ' . $e->getMessage());
-            // Simpan error ke session untuk debug jika diperlukan (opsional)
-            session()->flash('last_upload_error', $e->getMessage());
             return null;
         }
     }

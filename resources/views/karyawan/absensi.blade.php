@@ -300,7 +300,9 @@ async function submitAttendance(url, btn) {
             showToast(data.message, 'success');
             setTimeout(() => location.reload(), 2000);
         } else {
-            showToast(data.message, 'error');
+            // Tampilkan pesan error spesifik dari server jika ada
+            const errorMsg = data.message || 'Terjadi kesalahan pada server (500).';
+            showToast(errorMsg, 'error');
             btn.disabled = false;
             btn.innerHTML = originalText;
         }

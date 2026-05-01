@@ -63,6 +63,17 @@ Route::get('/debug-user', function() {
     return "Not logged in. Session driver: " . config('session.driver');
 });
 
+Route::get('/debug-routes', function() {
+    $routes = \Illuminate\Support\Facades\Route::getRoutes();
+    $data = [];
+    foreach ($routes as $route) {
+        if (str_starts_with($route->getName(), 'admin.')) {
+            $data[$route->getName()] = $route->uri();
+        }
+    }
+    return $data;
+});
+
 // =============================================
 // Dashboard redirect setelah login
 // =============================================

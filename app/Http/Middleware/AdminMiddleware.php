@@ -10,11 +10,18 @@ class AdminMiddleware
 {
     public function handle(Request $request, Closure $next): Response
     {
-        if (!auth()->check() || !auth()->user()->isAdmin()) {
+        if (!auth()->check()) {
+            return redirect()->route('login');
+        }
+
+        if (!auth()->user()->isAdmin()) {
             if ($request->expectsJson()) {
-                return response()->json(['message' => 'Unauthorized. Admin access required.'], 403);
+                return response()->json(['message' => 'Akses ditolak. Perlu izin Admin.'], 403);
             }
-            abort(403, 'Akses ditolak. Halaman ini hanya untuk Admin.');
+            
+            // Redirect ke dashboard karyawan jika bukan admin, jangan tampilkan halaman Forbidden yang kaku
+            return redirect()->route('karyawan.dashboard')
+                ->with('error', 'Akses ditolak. Halaman tersebut hanya bisa diakses oleh Admin.');
         }
 
         return $next($request);

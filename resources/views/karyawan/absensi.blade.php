@@ -179,19 +179,33 @@ function haversineJS(lat1, lon1, lat2, lon2) {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
 }
 
-// Camera
+// Camera & GPS Init
 document.getElementById('btn-start-camera').addEventListener('click', async () => {
+    // Jalankan GPS secara paralel, tidak menunggu kamera
+    initGPS();
+
     try {
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: 640, height: 480 }, audio: false });
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error("Browser atau perangkat Anda tidak mendukung akses kamera.");
+        }
+        
+        // Hapus constraint width & height yang kaku karena sering gagal (OverconstrainedError) di HP
+        stream = await navigator.mediaDevices.getUserMedia({ 
+            video: { facingMode: 'user' }, 
+            audio: false 
+        });
+        
         const video = document.getElementById('camera-video');
         video.srcObject = stream;
         document.getElementById('camera-placeholder').style.display = 'none';
         document.getElementById('btn-capture').disabled = false;
         document.getElementById('btn-start-camera').textContent = '✓ Kamera Aktif';
         document.getElementById('btn-start-camera').disabled = true;
-        initGPS();
     } catch (e) {
-        showToast('Gagal mengakses kamera: ' + e.message, 'error');
+        let errorMsg = e.message;
+        if (e.name === 'NotAllowedError') errorMsg = "Izin kamera ditolak oleh browser.";
+        else if (e.name === 'NotFoundError') errorMsg = "Tidak ada kamera yang terdeteksi di perangkat ini.";
+        showToast('Gagal mengakses kamera: ' + errorMsg, 'error');
     }
 });
 

@@ -33,93 +33,99 @@ class AttendanceController
      */
     public function clockIn(Request $request)
     {
-        $request->validate([
-            'latitude'    => 'required|numeric|between:-90,90',
-            'longitude'   => 'required|numeric|between:-180,180',
-            'photo'       => 'required|string',        // base64
-            'location_id' => 'required|exists:locations,id',
-        ]);
+        try {
+            $request->validate([
+                'latitude'    => 'required|numeric|between:-90,90',
+                'longitude'   => 'required|numeric|between:-180,180',
+                'photo'       => 'required|string',        // base64
+                'location_id' => 'required|exists:locations,id',
+            ]);
 
-        $user     = Auth::user();
-        $today    = today();
+            $user     = Auth::user();
+            $today    = today();
 
-        // Cek apakah sudah absen hari ini
-        $existing = Attendance::where('user_id', $user->id)
-            ->whereDate('date', $today)
-            ->first();
+            // Cek apakah sudah absen hari ini
+            $existing = Attendance::where('user_id', $user->id)
+                ->whereDate('date', $today)
+                ->first();
 
-        if ($existing && $existing->clock_in) {
+            if ($existing && $existing->clock_in) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda sudah melakukan absen masuk hari ini.',
+                ], 422);
+            }
+
+            // Validasi GPS dengan Haversine
+            $location = Location::findOrFail($request->location_id);
+            $check = isWithinRadius(
+                (float) $request->latitude,
+                (float) $request->longitude,
+                (float) $location->latitude,
+                (float) $location->longitude,
+                $location->radius
+            );
+
+            if (!$check['within']) {
+                return response()->json([
+                    'success'  => false,
+                    'message'  => "Anda berada di luar radius lokasi kerja. Jarak Anda: {$check['distance']} meter.",
+                    'distance' => $check['distance'],
+                ], 422);
+            }
+
+            // Upload foto ke Cloudinary
+            $photoUrl = $this->uploadPhotoToCloudinary($request->photo, $user->id, 'clock_in');
+
+            if (!$photoUrl) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal mengunggah foto. Pastikan koneksi internet stabil dan Cloudinary aktif.',
+                ], 500);
+            }
+
+            // Tentukan status (Hadir/Telat) berdasarkan jam server
+            $now       = now()->setTimezone('Asia/Jakarta');
+            
+            try {
+                $lateAfter = Carbon::parse($location->late_after)->setDate(
+                    $now->year, $now->month, $now->day
+                );
+            } catch (\Exception $e) {
+                $lateAfter = $now->copy()->startOfDay()->addHours(8)->addMinutes(30);
+            }
+            
+            $status = $now->greaterThan($lateAfter) ? 'Telat' : 'Hadir';
+
+            // Simpan atau update record
+            $attendance = Attendance::updateOrCreate(
+                ['user_id' => $user->id, 'date' => $today],
+                [
+                    'location_id'        => $location->id,
+                    'clock_in'           => $now,
+                    'clock_in_latitude'  => $request->latitude,
+                    'clock_in_longitude' => $request->longitude,
+                    'clock_in_photo'     => $photoUrl,
+                    'clock_in_distance'  => $check['distance'],
+                    'status'             => $status,
+                ]
+            );
+
+            return response()->json([
+                'success'    => true,
+                'message'    => "Absen masuk berhasil! Status: {$status}",
+                'status'     => $status,
+                'clock_in'   => $now->format('H:i:s'),
+                'distance'   => $check['distance'],
+                'photo_url'  => $photoUrl,
+            ]);
+        } catch (\Throwable $e) {
+            \Log::error('CLOCK IN CRASH: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Anda sudah melakukan absen masuk hari ini.',
-            ], 422);
-        }
-
-        // Validasi GPS dengan Haversine
-        $location = Location::findOrFail($request->location_id);
-        $check = isWithinRadius(
-            (float) $request->latitude,
-            (float) $request->longitude,
-            (float) $location->latitude,
-            (float) $location->longitude,
-            $location->radius
-        );
-
-        if (!$check['within']) {
-            return response()->json([
-                'success'  => false,
-                'message'  => "Anda berada di luar radius lokasi kerja. Jarak Anda: {$check['distance']} meter (radius: {$location->radius} meter).",
-                'distance' => $check['distance'],
-            ], 422);
-        }
-
-        // Upload foto ke Cloudinary
-        $photoUrl = $this->uploadPhotoToCloudinary($request->photo, $user->id, 'clock_in');
-
-        if (!$photoUrl) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Gagal mengunggah foto. Silahkan coba lagi.',
+                'message' => 'SERVER ERROR: ' . $e->getMessage() . ' in ' . basename($e->getFile()) . ':' . $e->getLine(),
             ], 500);
         }
-
-        // Tentukan status (Hadir/Telat) berdasarkan jam server
-        $now       = now()->setTimezone('Asia/Jakarta');
-        
-        try {
-            // Gunakan Carbon::parse agar lebih fleksibel terhadap format waktu di database
-            $lateAfter = Carbon::parse($location->late_after)->setDate(
-                $now->year, $now->month, $now->day
-            );
-        } catch (\Exception $e) {
-            \Log::error('Failed to parse late_after: ' . $e->getMessage());
-            $lateAfter = $now->copy()->startOfDay()->addHours(8)->addMinutes(30); // Default 08:30
-        }
-        
-        $status = $now->greaterThan($lateAfter) ? 'Telat' : 'Hadir';
-
-        // Simpan atau update record
-        $attendance = Attendance::updateOrCreate(
-            ['user_id' => $user->id, 'date' => $today],
-            [
-                'location_id'        => $location->id,
-                'clock_in'           => $now,
-                'clock_in_latitude'  => $request->latitude,
-                'clock_in_longitude' => $request->longitude,
-                'clock_in_photo'     => $photoUrl,
-                'clock_in_distance'  => $check['distance'],
-                'status'             => $status,
-            ]
-        );
-
-        return response()->json([
-            'success'    => true,
-            'message'    => "Absen masuk berhasil! Status: {$status}",
-            'status'     => $status,
-            'clock_in'   => $now->format('H:i:s'),
-            'distance'   => $check['distance'],
-            'photo_url'  => $photoUrl,
-        ]);
     }
 
     /**

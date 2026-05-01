@@ -8,6 +8,18 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
 // =============================================
+// Remote Database Setup (Khusus Vercel)
+// =============================================
+Route::get('/setup-db', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        return "Database berhasil di-migrate! <a href='/'>Klik di sini untuk Login</a>";
+    } catch (\Exception $e) {
+        return "Error saat menjalankan setup: " . $e->getMessage();
+    }
+});
+
+// =============================================
 // Self-Healing Migration (Otomatis Setup DB)
 // =============================================
 try {
@@ -17,7 +29,7 @@ try {
         \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
     }
 } catch (\Exception $e) {
-    // Abaikan error saat booting, biarkan Laravel yang menangani jika koneksi benar-benar mati
+    // Abaikan error saat booting
 }
 
 // =============================================
@@ -29,19 +41,6 @@ Route::get('/', function () {
     }
     return redirect('/login');
 });
-
-// =============================================
-// Remote Database Setup (Khusus Vercel)
-// =============================================
-Route::get('/setup-db', function () {
-    try {
-        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
-        return "Database berhasil di-migrate & di-seed! <a href='/'>Klik di sini untuk Login</a>";
-    } catch (\Exception $e) {
-        return "Error saat menjalankan setup: " . $e->getMessage();
-    }
-})->withoutMiddleware([\Illuminate\Session\Middleware\StartSession::class]);
 
 // Auth routes (Laravel Breeze)
 require __DIR__.'/auth.php';

@@ -84,7 +84,7 @@ class AttendanceController
         }
 
         // Tentukan status (Hadir/Telat) berdasarkan jam server
-        $now       = now()->setTimezone(config('app.timezone', 'Asia/Jakarta'));
+        $now       = now()->setTimezone('Asia/Jakarta');
         
         try {
             // Gunakan Carbon::parse agar lebih fleksibel terhadap format waktu di database

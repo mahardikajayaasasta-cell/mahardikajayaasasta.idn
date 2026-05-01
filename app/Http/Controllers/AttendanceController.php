@@ -85,9 +85,17 @@ class AttendanceController
 
         // Tentukan status (Hadir/Telat) berdasarkan jam server
         $now       = now()->setTimezone(config('app.timezone', 'Asia/Jakarta'));
-        $lateAfter = Carbon::createFromFormat('H:i:s', $location->late_after)->setDate(
-            $now->year, $now->month, $now->day
-        );
+        
+        try {
+            // Gunakan Carbon::parse agar lebih fleksibel terhadap format waktu di database
+            $lateAfter = Carbon::parse($location->late_after)->setDate(
+                $now->year, $now->month, $now->day
+            );
+        } catch (\Exception $e) {
+            \Log::error('Failed to parse late_after: ' . $e->getMessage());
+            $lateAfter = $now->copy()->startOfDay()->addHours(8)->addMinutes(30); // Default 08:30
+        }
+        
         $status = $now->greaterThan($lateAfter) ? 'Telat' : 'Hadir';
 
         // Simpan atau update record
@@ -225,12 +233,22 @@ class AttendanceController
     {
         try {
             // Bersihkan header data URL jika ada
-            if (str_contains($base64Photo, ',')) {
-                $base64Photo = explode(',', $base64Photo)[1];
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64Photo, $type)) {
+                $base64Photo = substr($base64Photo, strpos($base64Photo, ',') + 1);
             }
 
-            $tmpFile = tempnam(sys_get_temp_dir(), 'absensi_');
-            file_put_contents($tmpFile, base64_decode($base64Photo));
+            $decodedPhoto = base64_decode($base64Photo);
+            if (!$decodedPhoto) {
+                throw new \Exception("Gagal melakukan decode base64 foto.");
+            }
+
+            $tmpFile = tempnam(sys_get_temp_dir(), 'abs_');
+            file_put_contents($tmpFile, $decodedPhoto);
+
+            // Cek apakah Cloudinary sudah dikonfigurasi
+            if (!config('cloudinary.cloud_url') && !env('CLOUDINARY_URL')) {
+                throw new \Exception("Konfigurasi Cloudinary belum lengkap (CLOUDINARY_URL kosong).");
+            }
 
             $result = Cloudinary::upload($tmpFile, [
                 'folder'         => 'absensi/' . date('Y/m'),
@@ -238,17 +256,19 @@ class AttendanceController
                 'transformation' => [
                     'width'   => 800,
                     'height'  => 800,
-                    'crop'    => 'fill',
+                    'crop'    => 'limit',
                     'quality' => 'auto',
                     'format'  => 'webp',
                 ],
             ]);
 
-            unlink($tmpFile);
+            @unlink($tmpFile);
 
             return $result->getSecurePath();
         } catch (\Exception $e) {
-            \Log::error('Cloudinary upload failed: ' . $e->getMessage());
+            \Log::error('Attendance Photo Upload Error: ' . $e->getMessage());
+            // Simpan error ke session untuk debug jika diperlukan (opsional)
+            session()->flash('last_upload_error', $e->getMessage());
             return null;
         }
     }

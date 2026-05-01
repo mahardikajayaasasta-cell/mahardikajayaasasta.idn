@@ -22,7 +22,7 @@ class AdminLocationController
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'name'       => 'required|string|max:255',
             'address'    => 'nullable|string|max:500',
             'latitude'   => 'required|numeric|between:-90,90',
@@ -33,7 +33,7 @@ class AdminLocationController
             'late_after' => 'required|date_format:H:i',
         ]);
 
-        Location::create($request->validated() + [
+        Location::create($validated + [
             'work_start' => $request->work_start . ':00',
             'work_end'   => $request->work_end . ':00',
             'late_after' => $request->late_after . ':00',

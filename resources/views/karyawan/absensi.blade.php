@@ -189,11 +189,19 @@ document.getElementById('btn-start-camera').addEventListener('click', async () =
             throw new Error("Browser atau perangkat Anda tidak mendukung akses kamera.");
         }
         
-        // Hapus constraint width & height yang kaku karena sering gagal (OverconstrainedError) di HP
-        stream = await navigator.mediaDevices.getUserMedia({ 
-            video: { facingMode: 'user' }, 
-            audio: false 
-        });
+        try {
+            // Percobaan 1: Gunakan kamera depan
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: 'user' }, 
+                audio: false 
+            });
+        } catch (firstErr) {
+            // Percobaan 2: Fallback ke kamera apapun jika kamera depan gagal
+            stream = await navigator.mediaDevices.getUserMedia({ 
+                video: true, 
+                audio: false 
+            });
+        }
         
         const video = document.getElementById('camera-video');
         video.srcObject = stream;
@@ -203,7 +211,9 @@ document.getElementById('btn-start-camera').addEventListener('click', async () =
         document.getElementById('btn-start-camera').disabled = true;
     } catch (e) {
         let errorMsg = e.message;
-        if (e.name === 'NotAllowedError') errorMsg = "Izin kamera ditolak oleh browser.";
+        if (e.name === 'NotAllowedError' || errorMsg.includes('Permission denied')) {
+            errorMsg = "Browser tidak diberi izin oleh HP Anda. Buka Pengaturan HP > Aplikasi > Chrome > Izin, lalu Izinkan Kamera.";
+        }
         else if (e.name === 'NotFoundError') errorMsg = "Tidak ada kamera yang terdeteksi di perangkat ini.";
         showToast('Gagal mengakses kamera: ' + errorMsg, 'error');
     }

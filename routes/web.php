@@ -46,6 +46,23 @@ Route::get('/setup-db', function () {
 // Auth routes (Laravel Breeze)
 require __DIR__.'/auth.php';
 
+Route::get('/debug-user', function() {
+    if (auth()->check()) {
+        $user = auth()->user();
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+            'is_admin' => $user->isAdmin(),
+            'is_karyawan' => $user->isKaryawan(),
+            'session_driver' => config('session.driver'),
+            'session_id' => session()->getId(),
+        ];
+    }
+    return "Not logged in. Session driver: " . config('session.driver');
+});
+
 // =============================================
 // Dashboard redirect setelah login
 // =============================================

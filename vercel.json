@@ -1,6 +1,8 @@
 {
     "version": 2,
     "framework": null,
+    "buildCommand": "npm install && npm run build",
+    "outputDirectory": "public",
     "functions": {
         "api/index.php": {
             "runtime": "vercel-php@0.7.2"
@@ -8,16 +10,20 @@
     },
     "routes": [
         {
+            "src": "/build/(.*)",
+            "dest": "/build/$1"
+        },
+        {
+            "src": "/favicon\\.ico",
+            "dest": "/favicon.ico"
+        },
+        {
+            "src": "/(.*\\.(css|js|png|jpg|jpeg|svg|gif|woff|woff2|ttf|eot|map))",
+            "dest": "/$1"
+        },
+        {
             "src": "/(.*)",
             "dest": "/api/index.php"
         }
-    ],
-    "env": {
-        "APP_ENV": "production",
-        "APP_DEBUG": "true",
-        "LOG_CHANNEL": "stderr",
-        "LOG_LEVEL": "error",
-        "DB_CONNECTION": "mysql",
-        "SESSION_DRIVER": "cookie"
-    }
+    ]
 }

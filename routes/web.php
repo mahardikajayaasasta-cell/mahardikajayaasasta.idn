@@ -112,6 +112,10 @@ Route::middleware(['auth', 'karyawan'])->prefix('karyawan')->name('karyawan.')->
 // Admin Routes
 // =============================================
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    // Profile
+    Route::get('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'edit'])->name('profile');
+    Route::put('/profile', [\App\Http\Controllers\Admin\AdminProfileController::class, 'update'])->name('profile.update');
+
     // Dashboard
     Route::get('/dashboard', [AdminAttendanceController::class, 'dashboard'])->name('dashboard');
 

@@ -70,7 +70,7 @@
 
         <!-- User profile -->
         <div class="px-4 py-4 border-t border-slate-700">
-            <a href="{{ auth()->user()->isAdmin() ? route('admin.profile') : '#' }}" class="flex items-center gap-3 mb-3 p-2 -mx-2 rounded-xl hover:bg-slate-700/50 transition-colors group/profile" title="Pengaturan Profile">
+            <a href="{{ auth()->user()->isAdmin() ? route('admin.profile') : route('karyawan.profile') }}" class="flex items-center gap-3 mb-3 p-2 -mx-2 rounded-xl hover:bg-slate-700/50 transition-colors group/profile" title="Pengaturan Profile">
                 <div class="w-8 h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
                     {{ substr(auth()->user()->name, 0, 1) }}
                 </div>
@@ -128,6 +128,7 @@
                     <a href="{{ route('karyawan.dashboard') }}" class="nav-link {{ request()->routeIs('karyawan.dashboard') ? 'active' : '' }}">Dashboard</a>
                     <a href="{{ route('karyawan.absensi') }}" class="nav-link {{ request()->routeIs('karyawan.absensi') ? 'active' : '' }}">Absensi</a>
                     <a href="{{ route('karyawan.riwayat') }}" class="nav-link {{ request()->routeIs('karyawan.riwayat') ? 'active' : '' }}">Riwayat</a>
+                    <a href="{{ route('karyawan.profile') }}" class="nav-link {{ request()->routeIs('karyawan.profile') ? 'active' : '' }}">Pengaturan Profile</a>
                 @endif
                 <form method="POST" action="{{ route('logout') }}" class="mt-6 border-t border-slate-700 pt-4">
                     @csrf

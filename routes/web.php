@@ -106,6 +106,10 @@ Route::middleware(['auth', 'karyawan'])->prefix('karyawan')->name('karyawan.')->
 
     // Riwayat
     Route::get('/riwayat', [AttendanceController::class, 'history'])->name('riwayat');
+
+    // Profile
+    Route::get('/profile', [\App\Http\Controllers\KaryawanProfileController::class, 'edit'])->name('profile');
+    Route::put('/profile', [\App\Http\Controllers\KaryawanProfileController::class, 'update'])->name('profile.update');
 });
 
 // =============================================

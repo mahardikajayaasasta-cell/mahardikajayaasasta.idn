@@ -71,8 +71,12 @@
         <!-- User profile -->
         <div class="px-4 py-4 border-t border-slate-700">
             <a href="{{ auth()->user()->isAdmin() ? route('admin.profile') : route('karyawan.profile') }}" class="flex items-center gap-3 mb-3 p-2 -mx-2 rounded-xl hover:bg-slate-700/50 transition-colors group/profile" title="Pengaturan Profile">
-                <div class="w-8 h-8 shrink-0 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shadow-md">
-                    {{ substr(auth()->user()->name, 0, 1) }}
+                <div class="w-8 h-8 shrink-0 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shadow-md border-2 border-slate-700">
+                    @if(auth()->user()->profile_photo_url)
+                        <img src="{{ auth()->user()->profile_photo_url }}" class="w-full h-full object-cover">
+                    @else
+                        {{ substr(auth()->user()->name, 0, 1) }}
+                    @endif
                 </div>
                 <div class="min-w-0 flex-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
                     <p class="text-sm font-medium text-white truncate group-hover/profile:text-blue-400 transition-colors">{{ auth()->user()->name }}</p>
@@ -102,8 +106,12 @@
                 </div>
                 <span class="font-bold text-slate-800 text-sm">AbsensiApp</span>
             </div>
-            <div class="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
-                {{ substr(auth()->user()->name, 0, 1) }}
+            <div class="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+                @if(auth()->user()->profile_photo_url)
+                    <img src="{{ auth()->user()->profile_photo_url }}" class="w-full h-full object-cover">
+                @else
+                    {{ substr(auth()->user()->name, 0, 1) }}
+                @endif
             </div>
         </header>
 

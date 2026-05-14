@@ -10,9 +10,33 @@
     </div>
 
     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        <form action="{{ route('karyawan.profile.update') }}" method="POST" class="p-6 space-y-6">
+        <form action="{{ route('karyawan.profile.update') }}" method="POST" enctype="multipart/form-data" class="p-6 space-y-6">
             @csrf
             @method('PUT')
+
+            <!-- Profile Photo Section -->
+            <div class="flex flex-col items-center pb-6 border-b border-slate-100">
+                <div class="relative group">
+                    <div class="w-24 h-24 rounded-full overflow-hidden bg-slate-100 border-4 border-white shadow-md">
+                        @if($user->profile_photo_url)
+                            <img id="profile-preview" src="{{ $user->profile_photo_url }}" class="w-full h-full object-cover">
+                        @else
+                            <div id="profile-initial" class="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-400 to-indigo-500 text-white text-3xl font-bold">
+                                {{ substr($user->name, 0, 1) }}
+                            </div>
+                            <img id="profile-preview" src="#" class="w-full h-full object-cover hidden">
+                        @endif
+                    </div>
+                    <label for="photo-upload" class="absolute bottom-0 right-0 bg-blue-600 text-white p-2 rounded-full cursor-pointer shadow-lg hover:bg-blue-700 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
+                        </svg>
+                        <input type="file" name="photo" id="photo-upload" class="hidden" accept="image/*" onchange="previewImage(this)">
+                    </label>
+                </div>
+                <p class="text-xs text-slate-500 mt-3 text-center">Klik ikon kamera untuk ganti foto<br>(Maks. 2MB)</p>
+            </div>
 
             <div class="space-y-4">
                 <div>
@@ -92,6 +116,23 @@
         } else {
             input.type = 'password';
             icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />';
+        }
+    }
+
+    function previewImage(input) {
+        const preview = document.getElementById('profile-preview');
+        const initial = document.getElementById('profile-initial');
+        
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+                if (initial) initial.classList.add('hidden');
+            }
+            
+            reader.readAsDataURL(input.files[0]);
         }
     }
 </script>

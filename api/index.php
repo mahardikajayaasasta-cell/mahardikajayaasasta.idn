@@ -8,7 +8,7 @@ $envKeysToSanitize = ['CLOUDINARY_URL', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SE
 foreach ($envKeysToSanitize as $key) {
     $val = getenv($key);
     if ($val) {
-        $cleanVal = trim($val, '<>');
+        $cleanVal = str_replace(['<', '>'], '', $val);
         putenv("$key=$cleanVal");
         $_ENV[$key] = $cleanVal;
         $_SERVER[$key] = $cleanVal;

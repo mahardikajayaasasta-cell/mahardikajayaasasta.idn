@@ -30,7 +30,7 @@
         "APP_NAME": "Sistem Absensi",
         "APP_ENV": "production",
         "APP_KEY": "base64:bYHAyfIyyQSrPm9vwTabzIgQ3gV8jQrgP5GicpjMQFo=",
-        "APP_DEBUG": "false",
+        "APP_DEBUG": "true",
         "APP_URL": "https://mahardikajayaasasta-idn.vercel.app",
         "LOG_CHANNEL": "stderr",
         "LOG_LEVEL": "error",

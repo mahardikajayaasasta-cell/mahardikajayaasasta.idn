@@ -618,6 +618,7 @@ class ComposerStaticInite2f9a5706ce19be71f90b8bb57ac9f0a
         'App\\Exports\\AttendanceExport' => __DIR__ . '/../..' . '/app/Exports/AttendanceExport.php',
         'App\\Http\\Controllers\\Admin\\AdminAttendanceController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/AdminAttendanceController.php',
         'App\\Http\\Controllers\\Admin\\AdminLocationController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/AdminLocationController.php',
+        'App\\Http\\Controllers\\Admin\\AdminProfileController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/AdminProfileController.php',
         'App\\Http\\Controllers\\Admin\\AdminUserController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/AdminUserController.php',
         'App\\Http\\Controllers\\AttendanceController' => __DIR__ . '/../..' . '/app/Http/Controllers/AttendanceController.php',
         'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',

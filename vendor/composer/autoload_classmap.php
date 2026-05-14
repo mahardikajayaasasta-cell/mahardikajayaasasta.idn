@@ -10,6 +10,7 @@ return array(
     'App\\Exports\\AttendanceExport' => $baseDir . '/app/Exports/AttendanceExport.php',
     'App\\Http\\Controllers\\Admin\\AdminAttendanceController' => $baseDir . '/app/Http/Controllers/Admin/AdminAttendanceController.php',
     'App\\Http\\Controllers\\Admin\\AdminLocationController' => $baseDir . '/app/Http/Controllers/Admin/AdminLocationController.php',
+    'App\\Http\\Controllers\\Admin\\AdminProfileController' => $baseDir . '/app/Http/Controllers/Admin/AdminProfileController.php',
     'App\\Http\\Controllers\\Admin\\AdminUserController' => $baseDir . '/app/Http/Controllers/Admin/AdminUserController.php',
     'App\\Http\\Controllers\\AttendanceController' => $baseDir . '/app/Http/Controllers/AttendanceController.php',
     'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => $baseDir . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',

@@ -1,4 +1,7 @@
 <?php
+// Enable error reporting temporarily
+ini_set('display_errors', '1');
+error_reporting(E_ALL);
 
 // Vercel PHP Runtime entry point untuk Laravel
 $url = $_SERVER['REQUEST_URI'] ?? '/';

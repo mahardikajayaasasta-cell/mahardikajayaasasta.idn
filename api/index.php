@@ -3,6 +3,18 @@
 ini_set('display_errors', '1');
 error_reporting(E_ALL);
 
+// Sanitize Environment Variables (Remove < and > from common keys)
+$envKeysToSanitize = ['CLOUDINARY_URL', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET', 'CLOUDINARY_CLOUD_NAME'];
+foreach ($envKeysToSanitize as $key) {
+    $val = getenv($key);
+    if ($val) {
+        $cleanVal = trim($val, '<>');
+        putenv("$key=$cleanVal");
+        $_ENV[$key] = $cleanVal;
+        $_SERVER[$key] = $cleanVal;
+    }
+}
+
 // Vercel PHP Runtime entry point untuk Laravel
 $url = $_SERVER['REQUEST_URI'] ?? '/';
 

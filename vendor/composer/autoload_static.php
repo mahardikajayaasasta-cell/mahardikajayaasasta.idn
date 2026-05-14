@@ -621,6 +621,7 @@ class ComposerStaticInite2f9a5706ce19be71f90b8bb57ac9f0a
         'App\\Http\\Controllers\\Admin\\AdminProfileController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/AdminProfileController.php',
         'App\\Http\\Controllers\\Admin\\AdminUserController' => __DIR__ . '/../..' . '/app/Http/Controllers/Admin/AdminUserController.php',
         'App\\Http\\Controllers\\AttendanceController' => __DIR__ . '/../..' . '/app/Http/Controllers/AttendanceController.php',
+        'App\\Http\\Controllers\\KaryawanProfileController' => __DIR__ . '/../..' . '/app/Http/Controllers/KaryawanProfileController.php',
         'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',
         'App\\Http\\Middleware\\AdminMiddleware' => __DIR__ . '/../..' . '/app/Http/Middleware/AdminMiddleware.php',
         'App\\Http\\Middleware\\KaryawanMiddleware' => __DIR__ . '/../..' . '/app/Http/Middleware/KaryawanMiddleware.php',

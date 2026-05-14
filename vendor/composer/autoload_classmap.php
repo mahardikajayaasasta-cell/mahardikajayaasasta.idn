@@ -13,6 +13,7 @@ return array(
     'App\\Http\\Controllers\\Admin\\AdminProfileController' => $baseDir . '/app/Http/Controllers/Admin/AdminProfileController.php',
     'App\\Http\\Controllers\\Admin\\AdminUserController' => $baseDir . '/app/Http/Controllers/Admin/AdminUserController.php',
     'App\\Http\\Controllers\\AttendanceController' => $baseDir . '/app/Http/Controllers/AttendanceController.php',
+    'App\\Http\\Controllers\\KaryawanProfileController' => $baseDir . '/app/Http/Controllers/KaryawanProfileController.php',
     'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => $baseDir . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',
     'App\\Http\\Middleware\\AdminMiddleware' => $baseDir . '/app/Http/Middleware/AdminMiddleware.php',
     'App\\Http\\Middleware\\KaryawanMiddleware' => $baseDir . '/app/Http/Middleware/KaryawanMiddleware.php',

@@ -106,30 +106,28 @@
             @endforelse
         </div>
     </div>
-</div>
-        </div>
     </div>
-</div>
 
-<!-- Map View Mode -->
-<div id="map-view" class="hidden max-w-4xl mx-auto mb-8">
-    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
-        <div class="mb-4">
-            <h3 class="font-bold text-slate-800 text-lg">Peta Lokasi Kantor</h3>
-            <p class="text-xs text-slate-500">Berikut adalah daftar lokasi kantor yang tersedia untuk absensi.</p>
-        </div>
-        <div id="map"></div>
-        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
-            @foreach($locations as $loc)
-            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
-                <p class="font-bold text-slate-800 text-sm">{{ $loc->name }}</p>
-                <p class="text-xs text-slate-500 mt-1">{{ $loc->address }}</p>
-                <div class="mt-2 flex items-center gap-3">
-                    <span class="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Radius: {{ $loc->radius }}m</span>
-                    <a href="https://www.google.com/maps?q={{ $loc->latitude }},{{ $loc->longitude }}" target="_blank" class="text-[10px] font-bold text-blue-600 hover:underline">Buka di Maps →</a>
-                </div>
+    <!-- Map View Mode -->
+    <div id="map-view" class="hidden mb-8">
+        <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+            <div class="mb-4">
+                <h3 class="font-bold text-slate-800 text-lg">Peta Lokasi Kantor</h3>
+                <p class="text-xs text-slate-500">Berikut adalah daftar lokasi kantor yang tersedia untuk absensi.</p>
             </div>
-            @endforeach
+            <div id="map"></div>
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+                @foreach($locations as $loc)
+                <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                    <p class="font-bold text-slate-800 text-sm">{{ $loc->name }}</p>
+                    <p class="text-xs text-slate-500 mt-1">{{ $loc->address }}</p>
+                    <div class="mt-2 flex items-center gap-3">
+                        <span class="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Radius: {{ $loc->radius }}m</span>
+                        <a href="https://www.google.com/maps?q={{ $loc->latitude }},{{ $loc->longitude }}" target="_blank" class="text-[10px] font-bold text-blue-600 hover:underline">Buka di Maps →</a>
+                    </div>
+                </div>
+                @endforeach
+            </div>
         </div>
     </div>
 </div>

@@ -14,6 +14,14 @@
 </head>
 <body class="h-full bg-slate-50 font-['Inter']">
 
+<!-- Global Loading Overlay -->
+<div id="global-loader" class="fixed inset-0 z-[9999] flex items-center justify-center bg-white/80 backdrop-blur-sm transition-opacity duration-300 pointer-events-none opacity-0">
+    <div class="flex flex-col items-center">
+        <div class="w-12 h-12 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin"></div>
+        <p class="mt-4 text-sm font-bold text-slate-700 tracking-wider animate-pulse">MEMUAT...</p>
+    </div>
+</div>
+
 <!-- Sidebar -->
 <div class="flex h-full">
     <!-- Sidebar (desktop) -->
@@ -100,6 +108,7 @@
             <button id="mobile-menu-btn" class="p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
             </button>
+
             <div class="flex items-center gap-2">
                 <div class="w-7 h-7 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-lg flex items-center justify-center">
                     <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -186,6 +195,26 @@
 </style>
 
 <script>
+// Loader logic
+const loader = document.getElementById('global-loader');
+
+// Show loader on page navigation
+window.addEventListener('beforeunload', () => {
+    loader.classList.remove('opacity-0', 'pointer-events-none');
+    loader.classList.add('opacity-100');
+});
+
+// Show loader on form submissions
+document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', () => {
+        // Jangan tampilkan loader jika form memiliki data-no-loader
+        if (!form.hasAttribute('data-no-loader')) {
+            loader.classList.remove('opacity-0', 'pointer-events-none');
+            loader.classList.add('opacity-100');
+        }
+    });
+});
+
 // Mobile sidebar toggle
 const mobileBtn = document.getElementById('mobile-menu-btn');
 const mobileSidebar = document.getElementById('mobile-sidebar');

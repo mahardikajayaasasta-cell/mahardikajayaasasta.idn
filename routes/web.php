@@ -19,6 +19,10 @@ Route::get('/setup-db', function () {
     }
 });
 
+Route::get('/debug-locations', function () {
+    return \App\Models\Location::all();
+});
+
 // =============================================
 // Self-Healing Migration (Otomatis Setup DB)
 // =============================================

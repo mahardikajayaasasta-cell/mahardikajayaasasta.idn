@@ -1,15 +1,35 @@
 @extends('layouts.app')
 @section('title', 'Dashboard Karyawan')
 
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+    #map { height: 350px; width: 100%; border-radius: 1rem; border: 1px solid #e2e8f0; }
+    .nav-tabs .active { border-bottom: 2px solid #3b82f6; color: #3b82f6; }
+</style>
+@endpush
+
 @section('content')
 <div class="max-w-4xl mx-auto">
     <!-- Greeting -->
-    <div class="mb-6">
-        <h2 class="text-2xl font-bold text-slate-800">Halo, {{ auth()->user()->name }}! 👋</h2>
-        <p class="text-slate-500 text-sm mt-1">{{ now()->translatedFormat('l, d F Y') }}</p>
+    <div class="flex items-center justify-between gap-4 mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800">Halo, {{ auth()->user()->name }}! 👋</h2>
+            <p class="text-slate-500 text-sm mt-1">{{ now()->translatedFormat('l, d F Y') }}</p>
+        </div>
+        <!-- Mode Switcher -->
+        <div class="flex bg-slate-100 p-1 rounded-xl nav-tabs">
+            <button id="btn-mode-stats" class="px-4 py-2 text-xs font-bold rounded-lg transition-all active bg-white shadow-sm text-blue-600">
+                📊 Ringkasan
+            </button>
+            <button id="btn-mode-map" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-700">
+                📍 Lokasi Kantor
+            </button>
+        </div>
     </div>
 
-    <!-- Status Card Today -->
+    <div id="stats-view">
+        <!-- Status Card Today -->
     @php
         $statusColor = match($attendance?->status) {
             'Hadir'   => ['bg' => 'from-emerald-500 to-teal-500', 'badge' => 'bg-emerald-100 text-emerald-700'],
@@ -87,4 +107,89 @@
         </div>
     </div>
 </div>
+        </div>
+    </div>
+</div>
+
+<!-- Map View Mode -->
+<div id="map-view" class="hidden max-w-4xl mx-auto mb-8">
+    <div class="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm">
+        <div class="mb-4">
+            <h3 class="font-bold text-slate-800 text-lg">Peta Lokasi Kantor</h3>
+            <p class="text-xs text-slate-500">Berikut adalah daftar lokasi kantor yang tersedia untuk absensi.</p>
+        </div>
+        <div id="map"></div>
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+            @foreach($locations as $loc)
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <p class="font-bold text-slate-800 text-sm">{{ $loc->name }}</p>
+                <p class="text-xs text-slate-500 mt-1">{{ $loc->address }}</p>
+                <div class="mt-2 flex items-center gap-3">
+                    <span class="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">Radius: {{ $loc->radius }}m</span>
+                    <a href="https://www.google.com/maps?q={{ $loc->latitude }},{{ $loc->longitude }}" target="_blank" class="text-[10px] font-bold text-blue-600 hover:underline">Buka di Maps →</a>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+</div>
 @endsection
+
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+    let map = null;
+    const btnStats = document.getElementById('btn-mode-stats');
+    const btnMap = document.getElementById('btn-mode-map');
+    const statsView = document.getElementById('stats-view');
+    const mapView = document.getElementById('map-view');
+
+    btnStats.addEventListener('click', () => {
+        btnStats.className = 'px-4 py-2 text-xs font-bold rounded-lg transition-all bg-white shadow-sm text-blue-600';
+        btnMap.className = 'px-4 py-2 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-700';
+        statsView.classList.remove('hidden');
+        mapView.classList.add('hidden');
+    });
+
+    btnMap.addEventListener('click', () => {
+        btnMap.className = 'px-4 py-2 text-xs font-bold rounded-lg transition-all bg-white shadow-sm text-blue-600';
+        btnStats.className = 'px-4 py-2 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-700';
+        mapView.classList.remove('hidden');
+        statsView.classList.add('hidden');
+        
+        if (!map) {
+            initMap();
+        } else {
+            setTimeout(() => map.invalidateSize(), 100);
+        }
+    });
+
+    function initMap() {
+        map = L.map('map').setView([-6.200000, 106.816666], 11);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        const markers = [];
+        const locations = @json($locations);
+        
+        locations.forEach(loc => {
+            L.circle([loc.latitude, loc.longitude], {
+                color: '#3b82f6',
+                fillColor: '#3b82f6',
+                fillOpacity: 0.1,
+                radius: loc.radius
+            }).addTo(map);
+
+            const marker = L.marker([loc.latitude, loc.longitude]).addTo(map)
+                .bindPopup(`<b>${loc.name}</b><br>${loc.address}`);
+            markers.push(marker);
+        });
+
+        if (markers.length > 0) {
+            const group = new L.featureGroup(markers);
+            map.fitBounds(group.getBounds().pad(0.1));
+        }
+    }
+</script>
+@endpush

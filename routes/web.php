@@ -1,11 +1,5 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-
-Route::get('/debug-locations', function () {
-    return \App\Models\Location::all();
-});
-
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\Admin\AdminAttendanceController;
 use App\Http\Controllers\Admin\AdminUserController;

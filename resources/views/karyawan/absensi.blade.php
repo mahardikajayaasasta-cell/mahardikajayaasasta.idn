@@ -1,12 +1,30 @@
 @extends('layouts.app')
 @section('title', 'Absensi')
 
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+    #map { height: 300px; width: 100%; border-radius: 1rem; border: 1px solid #e2e8f0; }
+    .nav-tabs .active { border-bottom: 2px solid #3b82f6; color: #3b82f6; }
+</style>
+@endpush
+
 @section('content')
 <div class="max-w-2xl mx-auto">
     <!-- Header -->
     <div class="mb-6">
         <h2 class="text-2xl font-bold text-slate-800">Absensi Hari Ini</h2>
         <p class="text-slate-500 text-sm mt-1">{{ now()->translatedFormat('l, d F Y') }} • Waktu Server: <span id="server-time" class="font-mono font-semibold text-blue-600">{{ now()->setTimezone(config('app.timezone'))->format('H:i:s') }}</span></p>
+    </div>
+
+    <!-- Mode Tabs -->
+    <div class="flex border-b border-slate-200 mb-6 nav-tabs">
+        <button id="btn-mode-form" class="flex-1 py-3 text-sm font-semibold text-slate-500 active transition-all">
+            📝 Form Absensi
+        </button>
+        <button id="btn-mode-map" class="flex-1 py-3 text-sm font-semibold text-slate-500 transition-all">
+            📍 Lihat Peta Lokasi
+        </button>
     </div>
 
     <!-- Status card -->
@@ -25,7 +43,8 @@
         </div>
     @endif
 
-    <!-- Location selector -->
+    <div id="form-view">
+        <!-- Location selector -->
     <div class="mb-5">
         <label class="block text-sm font-semibold text-slate-700 mb-2">Pilih Lokasi Kerja</label>
         <select id="location-select" class="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white text-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm">
@@ -109,17 +128,115 @@
     <!-- Result toast -->
     <div id="result-toast" class="hidden fixed bottom-6 left-4 right-4 lg:left-auto lg:right-6 lg:w-96 p-4 rounded-2xl shadow-xl text-sm font-medium z-50 transition-all"></div>
 </div>
+
+<div id="map-view" class="hidden max-w-2xl mx-auto mb-8">
+    <div class="bg-white rounded-2xl border border-slate-200 p-4 shadow-sm">
+        <div class="mb-4">
+            <h3 class="font-bold text-slate-800">Peta Jangkauan</h3>
+            <p class="text-xs text-slate-500">Lingkaran biru menunjukkan radius absen yang diizinkan.</p>
+        </div>
+        <div id="map"></div>
+        <div class="mt-4 grid grid-cols-2 gap-3 text-xs">
+            <div class="flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                <span>Lokasi Anda</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                <span>Lokasi Kantor</span>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 <script>
 const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
 let stream = null;
 let capturedPhoto = null;
-let currentLat = null;
-let currentLon = null;
 let gpsReady = false;
 let photoReady = false;
+let map = null;
+let userMarker = null;
+let officeMarkers = [];
+let officeCircles = [];
+
+// Tab Switching
+const btnForm = document.getElementById('btn-mode-form');
+const btnMap = document.getElementById('btn-mode-map');
+const formView = document.getElementById('form-view');
+const mapView = document.getElementById('map-view');
+
+btnForm.addEventListener('click', () => {
+    btnForm.classList.add('active');
+    btnMap.classList.remove('active');
+    formView.classList.remove('hidden');
+    mapView.classList.add('hidden');
+});
+
+btnMap.addEventListener('click', () => {
+    btnMap.classList.add('active');
+    btnForm.classList.remove('active');
+    mapView.classList.remove('hidden');
+    formView.classList.add('hidden');
+    
+    // Init map if not exists
+    if (!map) {
+        initMap();
+    } else {
+        setTimeout(() => map.invalidateSize(), 100);
+    }
+});
+
+function initMap() {
+    map = L.map('map').setView([-6.200000, 106.816666], 13);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    // Add office markers
+    const locations = @json($locations);
+    locations.forEach(loc => {
+        const marker = L.marker([loc.latitude, loc.longitude]).addTo(map)
+            .bindPopup(`<b>${loc.name}</b><br>Radius: ${loc.radius}m`);
+        
+        const circle = L.circle([loc.latitude, loc.longitude], {
+            color: '#3b82f6',
+            fillColor: '#3b82f6',
+            fillOpacity: 0.1,
+            radius: loc.radius
+        }).addTo(map);
+
+        officeMarkers.push(marker);
+        officeCircles.push(circle);
+    });
+
+    if (currentLat && currentLon) {
+        updateUserOnMap();
+    }
+}
+
+function updateUserOnMap() {
+    if (!map) return;
+    
+    if (userMarker) {
+        userMarker.setLatLng([currentLat, currentLon]);
+    } else {
+        const userIcon = L.divIcon({
+            className: 'user-location-icon',
+            html: '<div class="w-4 h-4 bg-blue-600 border-2 border-white rounded-full shadow-lg"></div>',
+            iconSize: [16, 16]
+        });
+        userMarker = L.marker([currentLat, currentLon], { icon: userIcon }).addTo(map)
+            .bindPopup('Lokasi Anda');
+    }
+    
+    // Fit bounds to show all offices and user
+    const group = new L.featureGroup([...officeMarkers, userMarker]);
+    map.fitBounds(group.getBounds().pad(0.1));
+}
 
 // Clock update
 setInterval(() => {
@@ -161,6 +278,7 @@ function initGPS() {
             }
 
             gpsStatus.innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-emerald-500 flex-shrink-0"></div><span class="text-emerald-700">GPS aktif · Akurasi ±${acc}m${distanceInfo}</span>`;
+            updateUserOnMap();
             checkReady();
         },
         (err) => {

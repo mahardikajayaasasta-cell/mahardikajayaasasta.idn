@@ -4,8 +4,13 @@
 @push('styles')
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <style>
-    #map { height: 350px; width: 100%; border-radius: 1rem; border: 1px solid #e2e8f0; }
+    #map { height: 350px; width: 100%; border-radius: 1rem; border: 1px solid #e2e8f0; z-index: 10; }
     .nav-tabs .active { border-bottom: 2px solid #3b82f6; color: #3b82f6; }
+    /* Fix for Leaflet tiles distorted by Tailwind */
+    .leaflet-container img.leaflet-tile {
+        max-width: none !important;
+        max-height: none !important;
+    }
 </style>
 @endpush
 
@@ -158,7 +163,7 @@
         if (!map) {
             initMap();
         } else {
-            setTimeout(() => map.invalidateSize(), 100);
+            setTimeout(() => map.invalidateSize(), 300);
         }
     });
 

@@ -36,7 +36,14 @@ class AdminAttendanceController
             ->take(10)
             ->get();
 
-        return view('admin.dashboard', compact('stats', 'recentAttendances', 'today'));
+        $allTodayAttendances = Attendance::with('user', 'location')
+            ->whereDate('date', $today)
+            ->whereNotNull('clock_in_latitude')
+            ->get();
+
+        $locations = Location::active()->get();
+
+        return view('admin.dashboard', compact('stats', 'recentAttendances', 'allTodayAttendances', 'locations', 'today'));
     }
 
     /**

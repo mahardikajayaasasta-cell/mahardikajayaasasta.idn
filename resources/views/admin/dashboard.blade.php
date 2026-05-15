@@ -1,15 +1,36 @@
 @extends('layouts.app')
 @section('title', 'Dashboard Admin')
 
+@push('styles')
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<style>
+    #map { height: 450px; width: 100%; border-radius: 1rem; border: 1px solid #e2e8f0; }
+    .nav-tabs .active { border-bottom: 2px solid #3b82f6; color: #3b82f6; }
+</style>
+@endpush
+
 @section('content')
 <div class="max-w-6xl mx-auto">
-    <div class="mb-6">
-        <h2 class="text-2xl font-bold text-slate-800">Dashboard Admin</h2>
-        <p class="text-slate-500 text-sm mt-1">{{ now()->translatedFormat('l, d F Y') }}</p>
+    <div class="flex items-center justify-between gap-4 mb-6">
+        <div>
+            <h2 class="text-2xl font-bold text-slate-800">Dashboard Admin</h2>
+            <p class="text-slate-500 text-sm mt-1">{{ now()->translatedFormat('l, d F Y') }}</p>
+        </div>
+        <!-- Mode Switcher -->
+        <div class="flex bg-slate-100 p-1 rounded-xl nav-tabs">
+            <button id="btn-mode-stats" class="px-4 py-2 text-xs font-bold rounded-lg transition-all active bg-white shadow-sm text-blue-600">
+                📊 Ringkasan
+            </button>
+            <button id="btn-mode-map" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-700">
+                📍 Peta Live
+            </button>
+        </div>
     </div>
 
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+    <!-- Content Wrapper for Stats Mode -->
+    <div id="stats-view">
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         @php
             $statCards = [
                 ['label' => 'Total Karyawan', 'value' => $stats['total_karyawan'], 'color' => 'from-slate-600 to-slate-700', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857'],
@@ -108,6 +129,105 @@
                 </tbody>
             </table>
         </div>
+        </div>
+    </div>
+</div>
+
+<!-- Map View Mode -->
+<div id="map-view" class="hidden max-w-6xl mx-auto mb-8">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden p-5">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h3 class="font-bold text-slate-800">Peta Live Absensi</h3>
+                <p class="text-xs text-slate-500">Lokasi check-in karyawan hari ini.</p>
+            </div>
+            <div class="flex gap-4 text-xs font-medium">
+                <div class="flex items-center gap-1.5 text-slate-600">
+                    <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> Lokasi Kantor
+                </div>
+                <div class="flex items-center gap-1.5 text-slate-600">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Karyawan Hadir
+                </div>
+            </div>
+        </div>
+        <div id="map"></div>
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+    let map = null;
+    const btnStats = document.getElementById('btn-mode-stats');
+    const btnMap = document.getElementById('btn-mode-map');
+    const statsView = document.getElementById('stats-view');
+    const mapView = document.getElementById('map-view');
+
+    btnStats.addEventListener('click', () => {
+        btnStats.className = 'px-4 py-2 text-xs font-bold rounded-lg transition-all bg-white shadow-sm text-blue-600';
+        btnMap.className = 'px-4 py-2 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-700';
+        statsView.classList.remove('hidden');
+        mapView.classList.add('hidden');
+    });
+
+    btnMap.addEventListener('click', () => {
+        btnMap.className = 'px-4 py-2 text-xs font-bold rounded-lg transition-all bg-white shadow-sm text-blue-600';
+        btnStats.className = 'px-4 py-2 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-700';
+        mapView.classList.remove('hidden');
+        statsView.classList.add('hidden');
+        
+        if (!map) {
+            initMap();
+        } else {
+            setTimeout(() => map.invalidateSize(), 100);
+        }
+    });
+
+    function initMap() {
+        map = L.map('map').setView([-6.200000, 106.816666], 12);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        const markers = [];
+
+        // Add Locations
+        const locations = @json($locations);
+        locations.forEach(loc => {
+            const circle = L.circle([loc.latitude, loc.longitude], {
+                color: '#3b82f6',
+                fillColor: '#3b82f6',
+                fillOpacity: 0.1,
+                radius: loc.radius
+            }).addTo(map);
+
+            const marker = L.marker([loc.latitude, loc.longitude]).addTo(map)
+                .bindPopup(`<b>Kantor: ${loc.name}</b>`);
+            markers.push(marker);
+        });
+
+        // Add Today's Attendance
+        const attendances = @json($allTodayAttendances);
+        attendances.forEach(att => {
+            if (att.clock_in_latitude && att.clock_in_longitude) {
+                const userMarker = L.circleMarker([att.clock_in_latitude, att.clock_in_longitude], {
+                    radius: 6,
+                    fillColor: '#10b981',
+                    color: '#fff',
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).addTo(map)
+                .bindPopup(`<b>${att.user.name}</b><br>Pukul: ${att.clock_in.substring(11, 19)}<br>Status: ${att.status}`);
+                markers.push(userMarker);
+            }
+        });
+
+        if (markers.length > 0) {
+            const group = new L.featureGroup(markers);
+            map.fitBounds(group.getBounds().pad(0.1));
+        }
+    }
+</script>
+@endpush

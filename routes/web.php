@@ -20,6 +20,19 @@ Route::get('/setup-db', function () {
     }
 });
 
+Route::get('/debug-amanda', function() {
+    $user = \App\Models\User::find(157989);
+    if (!$user) {
+        return "User not found";
+    }
+    return [
+        'id' => $user->id,
+        'name' => $user->name,
+        'employee_id' => $user->employee_id,
+        'email' => $user->email,
+    ];
+});
+
 // =============================================
 // Self-Healing Migration (Otomatis Setup DB)
 // =============================================

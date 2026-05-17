@@ -82,21 +82,21 @@
                 <div>
                     <label for="type" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Jenis Pengajuan</label>
                     <div class="grid grid-cols-3 gap-2">
-                        <label class="relative flex items-center justify-center p-3 rounded-2xl border-2 border-slate-200 cursor-pointer hover:bg-slate-50 transition-all checked-label text-center">
+                        <label for="type-izin" class="relative flex items-center justify-center p-3 rounded-2xl border-2 border-slate-200 cursor-pointer hover:bg-slate-50 transition-all checked-label text-center">
                             <input type="radio" name="type" id="type-izin" value="izin" class="sr-only" checked onchange="toggleFormMode('izin')">
                             <div>
                                 <span class="block text-xs font-extrabold text-slate-800">Izin</span>
                                 <span class="block text-[8px] text-slate-400 mt-0.5">Maks 1 Hari</span>
                             </div>
                         </label>
-                        <label class="relative flex items-center justify-center p-3 rounded-2xl border-2 border-slate-200 cursor-pointer hover:bg-slate-50 transition-all checked-label text-center">
+                        <label for="type-sakit" class="relative flex items-center justify-center p-3 rounded-2xl border-2 border-slate-200 cursor-pointer hover:bg-slate-50 transition-all checked-label text-center">
                             <input type="radio" name="type" id="type-sakit" value="sakit" class="sr-only" onchange="toggleFormMode('sakit')">
                             <div>
                                 <span class="block text-xs font-extrabold text-slate-800">Sakit</span>
                                 <span class="block text-[8px] text-slate-400 mt-0.5">Sakit H-0</span>
                             </div>
                         </label>
-                        <label class="relative flex items-center justify-center p-3 rounded-2xl border-2 border-slate-200 cursor-pointer hover:bg-slate-50 transition-all checked-label text-center">
+                        <label for="type-cuti" class="relative flex items-center justify-center p-3 rounded-2xl border-2 border-slate-200 cursor-pointer hover:bg-slate-50 transition-all checked-label text-center">
                             <input type="radio" name="type" id="type-cuti" value="cuti" class="sr-only" onchange="toggleFormMode('cuti')">
                             <div>
                                 <span class="block text-xs font-extrabold text-slate-800">Cuti</span>

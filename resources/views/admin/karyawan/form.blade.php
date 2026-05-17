@@ -74,6 +74,20 @@
                     @error('phone') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
                 </div>
 
+                <!-- Lokasi Kerja -->
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-2">Lokasi Kerja</label>
+                    <select name="location_id" class="w-full px-4 py-2.5 rounded-xl border border-slate-200 focus:outline-none focus:ring-4 focus:ring-blue-50 focus:border-blue-400 transition-all">
+                        <option value="">Semua Lokasi (Fleksibel)</option>
+                        @foreach($locations as $loc)
+                            <option value="{{ $loc->id }}" {{ old('location_id', $user->location_id) == $loc->id ? 'selected' : '' }}>
+                                {{ $loc->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('location_id') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                </div>
+
                 <!-- Status (in Edit only) -->
                 @if($action === 'edit')
                 <div>

@@ -22,6 +22,7 @@ class User extends Authenticatable
         'is_active',
         'password',
         'profile_photo_url',
+        'location_id',
     ];
 
     protected $hidden = [
@@ -41,6 +42,11 @@ class User extends Authenticatable
     // =============================================
     // Relationships
     // =============================================
+
+    public function location(): \Illuminate\Database\Eloquent\Relations\BelongsTo
+    {
+        return $this->belongsTo(Location::class);
+    }
 
     public function attendances(): HasMany
     {

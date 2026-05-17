@@ -23,6 +23,7 @@
                         <th class="text-left px-5 py-4 font-semibold tracking-wider">Karyawan</th>
                         <th class="text-left px-4 py-4 font-semibold tracking-wider">ID / Email</th>
                         <th class="text-left px-4 py-4 font-semibold tracking-wider">Jabatan</th>
+                        <th class="text-left px-4 py-4 font-semibold tracking-wider">Lokasi Kerja</th>
                         <th class="text-left px-4 py-4 font-semibold tracking-wider">Status</th>
                         <th class="text-right px-5 py-4 font-semibold tracking-wider">Aksi</th>
                     </tr>
@@ -48,6 +49,16 @@
                         <td class="px-4 py-4">
                             <p class="text-slate-600">{{ $user->position ?? '-' }}</p>
                             <p class="text-xs text-slate-400 font-medium">{{ $user->department ?? '-' }}</p>
+                        </td>
+                        <td class="px-4 py-4">
+                            @if($user->location)
+                                <p class="text-slate-700 font-semibold">{{ $user->location->name }}</p>
+                                <p class="text-[10px] text-slate-400">Radius: {{ $user->location->radius }}m</p>
+                            @else
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                                    Semua Lokasi
+                                </span>
+                            @endif
                         </td>
                         <td class="px-4 py-4">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold {{ $user->is_active ? 'bg-emerald-100 text-emerald-700' : 'bg-slate-100 text-slate-700' }}">

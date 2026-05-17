@@ -18,7 +18,8 @@ class AdminUserController
 
     public function create()
     {
-        return view('admin.karyawan.form', ['user' => new User(), 'action' => 'create']);
+        $locations = \App\Models\Location::active()->get();
+        return view('admin.karyawan.form', ['user' => new User(), 'action' => 'create', 'locations' => $locations]);
     }
 
     public function store(Request $request)
@@ -30,6 +31,7 @@ class AdminUserController
             'department'  => 'nullable|string|max:100',
             'position'    => 'nullable|string|max:100',
             'phone'       => 'nullable|string|max:20',
+            'location_id' => 'nullable|exists:locations,id',
             'password'    => 'required|string|min:8|confirmed',
         ]);
 
@@ -40,6 +42,7 @@ class AdminUserController
             'department'  => $request->department,
             'position'    => $request->position,
             'phone'       => $request->phone,
+            'location_id' => $request->location_id,
             'role'        => 'karyawan',
             'password'    => Hash::make($request->password),
             'is_active'   => true,
@@ -51,7 +54,8 @@ class AdminUserController
 
     public function edit(User $karyawan)
     {
-        return view('admin.karyawan.form', ['user' => $karyawan, 'action' => 'edit']);
+        $locations = \App\Models\Location::active()->get();
+        return view('admin.karyawan.form', ['user' => $karyawan, 'action' => 'edit', 'locations' => $locations]);
     }
 
     public function update(Request $request, User $karyawan)
@@ -63,10 +67,11 @@ class AdminUserController
             'department'  => 'nullable|string|max:100',
             'position'    => 'nullable|string|max:100',
             'phone'       => 'nullable|string|max:20',
+            'location_id' => 'nullable|exists:locations,id',
             'password'    => 'nullable|string|min:8|confirmed',
         ]);
 
-        $data = $request->only(['name', 'email', 'employee_id', 'department', 'position', 'phone']);
+        $data = $request->only(['name', 'email', 'employee_id', 'department', 'position', 'phone', 'location_id']);
         $data['is_active'] = $request->boolean('is_active');
 
         if ($request->filled('password')) {

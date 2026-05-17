@@ -23,7 +23,9 @@ class AttendanceController
             ->whereDate('date', $today)
             ->first();
 
-        $locations = Location::active()->get();
+        $locations = $user->location_id 
+            ? Location::where('id', $user->location_id)->get() 
+            : Location::active()->get();
 
         return view('karyawan.absensi', compact('attendance', 'locations', 'today'));
     }
@@ -43,6 +45,14 @@ class AttendanceController
 
             $user     = Auth::user();
             $today    = today();
+
+            // Cek apakah user punya lokasi khusus yang ditentukan admin
+            if ($user->location_id && $user->location_id != $request->location_id) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Anda tidak diizinkan melakukan absensi di lokasi ini. Silakan pilih lokasi kerja yang sesuai dengan penugasan Anda.',
+                ], 403);
+            }
 
             // Cek apakah sudah absen hari ini
             $existing = Attendance::where('user_id', $user->id)
@@ -142,6 +152,14 @@ class AttendanceController
 
         $user  = Auth::user();
         $today = today();
+
+        // Cek apakah user punya lokasi khusus yang ditentukan admin
+        if ($user->location_id && $user->location_id != $request->location_id) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Anda tidak diizinkan melakukan absensi di lokasi ini. Silakan pilih lokasi kerja yang sesuai dengan penugasan Anda.',
+            ], 403);
+        }
 
         $attendance = Attendance::where('user_id', $user->id)
             ->whereDate('date', $today)

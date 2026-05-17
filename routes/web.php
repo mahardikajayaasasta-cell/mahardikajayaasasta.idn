@@ -93,7 +93,9 @@ Route::middleware(['auth', 'karyawan'])->prefix('karyawan')->name('karyawan.')->
         $user = Auth::user();
         $today = today();
         $attendance = $user->todayAttendance();
-        $locations = \App\Models\Location::active()->get();
+        $locations = $user->location_id 
+            ? \App\Models\Location::where('id', $user->location_id)->get() 
+            : \App\Models\Location::active()->get();
         $recentHistory = \App\Models\Attendance::where('user_id', $user->id)
             ->orderBy('date', 'desc')->take(7)->get();
 

@@ -24,7 +24,8 @@ class LeaveController
             ->where('type', 'cuti')
             ->whereIn('status', ['approved', 'pending'])
             ->whereYear('date', $currentYear)
-            ->count();
+            ->get()
+            ->sum('duration');
             
         $remainingCuti = max(0, 12 - $usedCuti);
             
@@ -39,54 +40,77 @@ class LeaveController
             $request->validate([
                 'type' => 'required|in:izin,sakit,cuti',
                 'date' => 'required|date',
+                'end_date' => 'nullable|date|after_or_equal:date',
                 'reason' => 'required|string|max:1000',
                 'attachment' => 'nullable|file|mimes:jpeg,png,jpg,pdf|max:2048',
             ], [
                 'type.required' => 'Jenis pengajuan wajib dipilih.',
-                'date.required' => 'Tanggal pengajuan wajib diisi.',
+                'date.required' => 'Tanggal mulai wajib diisi.',
+                'end_date.after_or_equal' => 'Tanggal akhir harus sama atau setelah tanggal mulai.',
                 'reason.required' => 'Alasan pengajuan wajib diisi.',
                 'attachment.max' => 'Ukuran file surat/dokumen maksimal 2MB.',
                 'attachment.mimes' => 'Format dokumen harus jpeg, png, jpg, atau pdf.',
             ]);
 
-            $date = $request->date;
-            $year = Carbon::parse($date)->year;
+            $startDate = Carbon::parse($request->date);
+            $endDate = $request->end_date ? Carbon::parse($request->end_date) : $startDate;
+            $duration = $startDate->diffInDays($endDate) + 1;
+            $year = $startDate->year;
 
-            // 1. Validasi: tidak boleh melakukan pengajuan izin/sakit/cuti di tanggal yang sama (duplikat)
-            $exists = Leave::where('user_id', $user->id)
-                ->whereDate('date', $date)
-                ->exists();
-            if ($exists) {
-                return back()->withErrors(['date' => 'Anda sudah memiliki pengajuan izin/sakit/cuti pada tanggal ini.'])->withInput();
+            // 1. Validasi Maksimal Durasi Pengajuan
+            // Cuti: Maksimal 2 Hari per pengajuan
+            if ($request->type === 'cuti' && $duration > 2) {
+                return back()->withErrors(['end_date' => 'Maksimal sekali pengajuan cuti adalah 2 hari berturut-turut. Jika membutuhkan lebih dari 2 hari, silakan ajukan secara terpisah setelah masuk kembali.'])->withInput();
             }
 
-            // Validasi: tidak boleh mengajukan izin jika sudah ada absensi pada hari itu
+            // Izin: Maksimal 1 Hari per pengajuan
+            if ($request->type === 'izin' && $duration > 1) {
+                return back()->withErrors(['end_date' => 'Maksimal pengajuan izin adalah 1 hari per pengajuan agar terdeteksi hari masuk kerja berikutnya.'])->withInput();
+            }
+
+            // 2. Validasi Tumpang Tindih Tanggal (Overlap Check)
+            $overlap = Leave::where('user_id', $user->id)
+                ->where(function($q) use ($startDate, $endDate) {
+                    $q->where(function($sub) use ($startDate, $endDate) {
+                        $sub->whereRaw('date <= ?', [$endDate->format('Y-m-d')])
+                           ->whereRaw('COALESCE(end_date, date) >= ?', [$startDate->format('Y-m-d')]);
+                    });
+                })
+                ->exists();
+                
+            if ($overlap) {
+                return back()->withErrors(['date' => 'Anda sudah memiliki pengajuan izin/sakit/cuti yang aktif pada tanggal atau rentang tanggal tersebut.'])->withInput();
+            }
+
+            // 3. Validasi Kehadiran
             $hasAttendance = Attendance::where('user_id', $user->id)
-                ->whereDate('date', $date)
+                ->whereBetween('date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
                 ->exists();
             if ($hasAttendance) {
-                return back()->withErrors(['date' => 'Tidak dapat mengajukan izin karena Anda sudah tercatat hadir/absen pada tanggal tersebut.'])->withInput();
+                return back()->withErrors(['date' => 'Tidak dapat mengajukan izin/cuti/sakit karena Anda sudah tercatat melakukan absensi/kehadiran pada salah satu tanggal dalam rentang tersebut.'])->withInput();
             }
 
-            // 2. Validasi: pengajuan 'izin' dan 'cuti' minimal H-1
+            // 4. Validasi H-1 untuk Izin & Cuti
             if (in_array($request->type, ['izin', 'cuti'])) {
                 $tomorrow = today()->addDay()->format('Y-m-d');
-                if ($date < $tomorrow) {
+                if ($startDate->format('Y-m-d') < $tomorrow) {
                     $typeName = $request->type === 'cuti' ? 'cuti' : 'izin';
-                    return back()->withErrors(['date' => "Pengajuan {$typeName} harus diajukan minimal H-1 sebelum tanggal pengajuan."])->withInput();
+                    return back()->withErrors(['date' => "Pengajuan {$typeName} harus diajukan minimal H-1 sebelum tanggal mulai pengajuan."])->withInput();
                 }
             }
 
-            // 3. Validasi: jatah cuti maksimal 12 hari per tahun kalender
+            // 5. Validasi Kuota Cuti Tahunan (12 Hari)
             if ($request->type === 'cuti') {
                 $usedCutiCount = Leave::where('user_id', $user->id)
                     ->where('type', 'cuti')
                     ->whereIn('status', ['approved', 'pending'])
                     ->whereYear('date', $year)
-                    ->count();
+                    ->get()
+                    ->sum('duration');
                     
-                if ($usedCutiCount >= 12) {
-                    return back()->withErrors(['type' => "Batas jatah cuti tahunan Anda untuk tahun {$year} telah habis (Maksimal 12 hari per tahun, terpakai/pending: {$usedCutiCount} hari)."])->withInput();
+                if ($usedCutiCount + $duration > 12) {
+                    $sisa = max(0, 12 - $usedCutiCount);
+                    return back()->withErrors(['type' => "Batas jatah cuti tahunan Anda untuk tahun {$year} tidak mencukupi (Maksimal 12 hari per tahun. Cuti terpakai/pending: {$usedCutiCount} hari, sisa kuota: {$sisa} hari, durasi yang diajukan: {$duration} hari)."])->withInput();
                 }
             }
 
@@ -102,7 +126,8 @@ class LeaveController
             Leave::create([
                 'user_id' => $user->id,
                 'type' => $request->type,
-                'date' => $date,
+                'date' => $startDate->format('Y-m-d'),
+                'end_date' => $request->end_date ? $endDate->format('Y-m-d') : null,
                 'reason' => $request->reason,
                 'attachment' => $attachmentUrl,
                 'status' => 'pending',

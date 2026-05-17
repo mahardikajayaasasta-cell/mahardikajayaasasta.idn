@@ -42,28 +42,43 @@ class AdminLeaveController
                 'verified_by' => auth()->id(),
             ]);
 
-            $dateStr = $leave->date->format('Y-m-d');
-
+            $startDate = $leave->date;
+            $endDate = $leave->end_date ?? $startDate;
+            
             if ($status === 'approved') {
-                // Jika disetujui, buat atau update catatan kehadiran
-                Attendance::updateOrCreate(
-                    [
-                        'user_id' => $leave->user_id,
-                        'date' => $dateStr,
-                    ],
-                    [
-                        'status' => $leave->type === 'izin' ? 'Izin' : ($leave->type === 'sakit' ? 'Sakit' : 'Cuti'),
-                        'notes' => 'Pengajuan ' . ucfirst($leave->type) . ' disetujui Admin. Alasan: ' . $leave->reason,
-                    ]
-                );
-            } else {
-                // Jika ditolak, hapus catatan kehadiran otomatis yang bertipe Izin/Sakit/Cuti
-                $attendance = Attendance::where('user_id', $leave->user_id)
-                    ->whereDate('date', $dateStr)
-                    ->first();
+                // Loop through each day in the range and record attendance
+                $currentDate = $startDate->copy();
+                while ($currentDate->lte($endDate)) {
+                    $dateStr = $currentDate->format('Y-m-d');
                     
-                if ($attendance && in_array($attendance->status, ['Izin', 'Sakit', 'Cuti'])) {
-                    $attendance->delete();
+                    Attendance::updateOrCreate(
+                        [
+                            'user_id' => $leave->user_id,
+                            'date' => $dateStr,
+                        ],
+                        [
+                            'status' => $leave->type === 'izin' ? 'Izin' : ($leave->type === 'sakit' ? 'Sakit' : 'Cuti'),
+                            'notes' => 'Pengajuan ' . ucfirst($leave->type) . ' disetujui Admin. Alasan: ' . $leave->reason,
+                        ]
+                    );
+                    
+                    $currentDate->addDay();
+                }
+            } else {
+                // Loop through each day in the range and remove attendance
+                $currentDate = $startDate->copy();
+                while ($currentDate->lte($endDate)) {
+                    $dateStr = $currentDate->format('Y-m-d');
+                    
+                    $attendance = Attendance::where('user_id', $leave->user_id)
+                        ->whereDate('date', $dateStr)
+                        ->first();
+                        
+                    if ($attendance && in_array($attendance->status, ['Izin', 'Sakit', 'Cuti'])) {
+                        $attendance->delete();
+                    }
+                    
+                    $currentDate->addDay();
                 }
             }
 

@@ -91,7 +91,13 @@
                             </td>
                             <!-- Tanggal -->
                             <td class="py-4 px-6 font-semibold text-slate-700 whitespace-nowrap">
-                                {{ $leave->date->translatedFormat('d F Y') }}
+                                @if($leave->end_date && !$leave->end_date->eq($leave->date))
+                                    {{ $leave->date->translatedFormat('d/m/Y') }} - {{ $leave->end_date->translatedFormat('d/m/Y') }}
+                                    <span class="block text-[10px] text-slate-400 font-medium">Durasi: {{ $leave->duration }} Hari</span>
+                                @else
+                                    {{ $leave->date->translatedFormat('d F Y') }}
+                                    <span class="block text-[10px] text-slate-400 font-medium">Durasi: 1 Hari</span>
+                                @endif
                             </td>
                             <!-- Jenis -->
                             <td class="py-4 px-6 whitespace-nowrap">

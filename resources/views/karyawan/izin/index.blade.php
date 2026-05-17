@@ -86,7 +86,7 @@
                             <input type="radio" name="type" id="type-izin" value="izin" class="sr-only" checked onchange="toggleFormMode('izin')">
                             <div>
                                 <span class="block text-xs font-extrabold text-slate-800">Izin</span>
-                                <span class="block text-[8px] text-slate-400 mt-0.5">Keperluan</span>
+                                <span class="block text-[8px] text-slate-400 mt-0.5">Maks 1 Hari</span>
                             </div>
                         </label>
                         <label class="relative flex items-center justify-center p-3 rounded-2xl border-2 border-slate-200 cursor-pointer hover:bg-slate-50 transition-all checked-label text-center">
@@ -100,22 +100,29 @@
                             <input type="radio" name="type" id="type-cuti" value="cuti" class="sr-only" onchange="toggleFormMode('cuti')">
                             <div>
                                 <span class="block text-xs font-extrabold text-slate-800">Cuti</span>
-                                <span class="block text-[8px] text-slate-400 mt-0.5">Tahunan</span>
+                                <span class="block text-[8px] text-slate-400 mt-0.5">Maks 2 Hari</span>
                             </div>
                         </label>
                     </div>
                 </div>
 
-                <!-- Tanggal Izin -->
-                <div>
-                    <label for="date" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Tanggal Pengajuan</label>
-                    <input type="date" name="date" id="date" value="{{ old('date', today()->format('Y-m-d')) }}" required
-                        class="w-full px-4 py-3 rounded-2xl border border-slate-200 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-none transition-all">
-                    <p id="date-helper" class="text-[11px] text-amber-600 font-medium mt-1.5 flex items-center gap-1">
-                        <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                        <span>Khusus izin wajib diajukan minimal H-1.</span>
-                    </p>
+                <!-- Rentang Tanggal -->
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label for="date" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Tanggal Mulai</label>
+                        <input type="date" name="date" id="date" value="{{ old('date', today()->format('Y-m-d')) }}" required
+                            class="w-full px-3 py-3 rounded-2xl border border-slate-200 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-none transition-all">
+                    </div>
+                    <div>
+                        <label for="end_date" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Tanggal Selesai</label>
+                        <input type="date" name="end_date" id="end_date" value="{{ old('end_date', today()->format('Y-m-d')) }}"
+                            class="w-full px-3 py-3 rounded-2xl border border-slate-200 text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500 focus:outline-none transition-all">
+                    </div>
                 </div>
+                <p id="date-helper" class="text-[11px] text-amber-600 font-medium mt-1.5 flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span>Khusus izin wajib diajukan minimal H-1.</span>
+                </p>
 
                 <!-- Alasan -->
                 <div>
@@ -151,7 +158,7 @@
             <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
                 <div>
                     <h2 class="font-bold text-slate-800 text-base">Riwayat Pengajuan Anda</h2>
-                    <p class="text-slate-400 text-xs mt-0.5">Daftar pengajuan izin, sakit, dan cuti yang telah Anda buat.</p>
+                    <p class="text-slate-400 text-xs mt-0.5">Daftar pengajuan cuti, izin, dan sakit yang telah Anda buat.</p>
                 </div>
             </div>
 
@@ -179,7 +186,13 @@
                             @foreach($leaves as $leave)
                                 <tr class="hover:bg-slate-50/50 transition-colors">
                                     <td class="py-4 px-6 font-semibold text-slate-800 whitespace-nowrap">
-                                        {{ $leave->date->translatedFormat('d F Y') }}
+                                        @if($leave->end_date && !$leave->end_date->eq($leave->date))
+                                            {{ $leave->date->translatedFormat('d/m/Y') }} - {{ $leave->end_date->translatedFormat('d/m/Y') }}
+                                            <span class="block text-[10px] text-slate-400 font-medium">Durasi: {{ $leave->duration }} Hari</span>
+                                        @else
+                                            {{ $leave->date->translatedFormat('d F Y') }}
+                                            <span class="block text-[10px] text-slate-400 font-medium">Durasi: 1 Hari</span>
+                                        @endif
                                     </td>
                                     <td class="py-4 px-6 whitespace-nowrap">
                                         @if($leave->type === 'izin')
@@ -269,6 +282,7 @@
     // Toggle mode validasi tanggal berdasarkan tipe pengajuan (H-1)
     function toggleFormMode(type) {
         const dateInput = document.getElementById('date');
+        const endDateInput = document.getElementById('end_date');
         const dateHelper = document.getElementById('date-helper');
         
         // Dapatkan string tanggal hari ini & besok (WIB)
@@ -286,37 +300,127 @@
         if (type === 'izin') {
             // Khusus Izin: Minimal H-1 (besok)
             dateInput.min = formatDate(tomorrow);
+            endDateInput.min = formatDate(tomorrow);
             if (dateInput.value < formatDate(tomorrow)) {
                 dateInput.value = formatDate(tomorrow);
+            }
+            if (endDateInput.value < formatDate(tomorrow)) {
+                endDateInput.value = formatDate(tomorrow);
             }
             dateHelper.innerHTML = `
                 <svg class="w-3.5 h-3.5 shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span>Pengajuan izin (keperluan) wajib didaftarkan minimal H-1.</span>
+                <span>Pengajuan izin (keperluan) wajib H-1 dan maksimal 1 hari.</span>
             `;
             dateHelper.className = 'text-[11px] font-medium mt-1.5 flex items-center gap-1 text-amber-600';
+            
+            // Pengajuan izin maksimal 1 hari
+            endDateInput.value = dateInput.value;
+            endDateInput.readOnly = true;
+            endDateInput.classList.add('bg-slate-50', 'text-slate-400');
         } else if (type === 'cuti') {
             // Khusus Cuti: Minimal H-1 (besok)
             dateInput.min = formatDate(tomorrow);
+            endDateInput.min = formatDate(tomorrow);
             if (dateInput.value < formatDate(tomorrow)) {
                 dateInput.value = formatDate(tomorrow);
             }
+            if (endDateInput.value < formatDate(tomorrow)) {
+                endDateInput.value = formatDate(tomorrow);
+            }
             dateHelper.innerHTML = `
                 <svg class="w-3.5 h-3.5 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span>Pengajuan cuti tahunan wajib didaftarkan minimal H-1.</span>
+                <span>Pengajuan cuti wajib H-1, memotong jatah cuti, dan maksimal 2 hari berturut-turut.</span>
             `;
             dateHelper.className = 'text-[11px] font-medium mt-1.5 flex items-center gap-1 text-indigo-600';
+            
+            endDateInput.readOnly = false;
+            endDateInput.classList.remove('bg-slate-50', 'text-slate-400');
         } else {
             // Sakit: Boleh hari ini (H-0)
             dateInput.min = formatDate(today);
+            endDateInput.min = formatDate(today);
+            if (dateInput.value < formatDate(today)) {
+                dateInput.value = formatDate(today);
+            }
+            if (endDateInput.value < formatDate(today)) {
+                endDateInput.value = formatDate(today);
+            }
             dateHelper.innerHTML = `
                 <svg class="w-3.5 h-3.5 shrink-0 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 <span>Pengajuan sakit dapat diajukan mulai hari ini (H-0).</span>
             `;
             dateHelper.className = 'text-[11px] font-medium mt-1.5 flex items-center gap-1 text-purple-600';
+            
+            endDateInput.readOnly = false;
+            endDateInput.classList.remove('bg-slate-50', 'text-slate-400');
         }
         
         updateRadioStyles();
     }
+
+    // Listener interaksi antar kalender tanggal
+    document.getElementById('date').addEventListener('change', function() {
+        const type = document.querySelector('input[name="type"]:checked').value;
+        const endDateInput = document.getElementById('end_date');
+        
+        endDateInput.min = this.value;
+        
+        if (type === 'izin') {
+            endDateInput.value = this.value;
+        } else if (type === 'cuti') {
+            const startDate = new Date(this.value);
+            const endDate = new Date(endDateInput.value);
+            
+            if (endDate < startDate) {
+                endDateInput.value = this.value;
+            } else {
+                const diffTime = Math.abs(endDate - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                if (diffDays > 2) {
+                    endDateInput.value = this.value;
+                    Swal.fire({
+                        title: 'Info Pengajuan Cuti',
+                        text: 'Maksimal sekali pengajuan cuti adalah 2 hari berturut-turut.',
+                        icon: 'info',
+                        confirmButtonColor: '#4f46e5',
+                        customClass: { popup: 'rounded-2xl', confirmButton: 'rounded-xl' }
+                    });
+                }
+            }
+        }
+    });
+
+    document.getElementById('end_date').addEventListener('change', function() {
+        const type = document.querySelector('input[name="type"]:checked').value;
+        const startDateInput = document.getElementById('date');
+        
+        if (type === 'cuti') {
+            const startDate = new Date(startDateInput.value);
+            const endDate = new Date(this.value);
+            
+            const diffTime = Math.abs(endDate - startDate);
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            
+            if (diffDays > 2) {
+                // Atur agar tanggal selesai adalah maksimal tanggal mulai + 1 hari
+                const maxEndDate = new Date(startDate);
+                maxEndDate.setDate(startDate.getDate() + 1);
+                
+                const year = maxEndDate.getFullYear();
+                const month = String(maxEndDate.getMonth() + 1).padStart(2, '0');
+                const day = String(maxEndDate.getDate()).padStart(2, '0');
+                this.value = `${year}-${month}-${day}`;
+                
+                Swal.fire({
+                    title: 'Peringatan Durasi Cuti',
+                    text: 'Maksimal sekali pengajuan cuti adalah 2 hari berturut-turut.',
+                    icon: 'warning',
+                    confirmButtonColor: '#4f46e5',
+                    customClass: { popup: 'rounded-2xl', confirmButton: 'rounded-xl' }
+                });
+            }
+        }
+    });
 
     // Inisialisasi awal saat load
     document.addEventListener('DOMContentLoaded', () => {

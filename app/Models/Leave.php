@@ -14,6 +14,7 @@ class Leave extends Model
         'user_id',
         'type',
         'date',
+        'end_date',
         'reason',
         'attachment',
         'status',
@@ -22,7 +23,15 @@ class Leave extends Model
 
     protected $casts = [
         'date' => 'date',
+        'end_date' => 'date',
     ];
+
+    public function getDurationAttribute(): int
+    {
+        $startDate = $this->date;
+        $endDate = $this->end_date ?? $startDate;
+        return $startDate->diffInDays($endDate) + 1;
+    }
 
     // =============================================
     // Relationships

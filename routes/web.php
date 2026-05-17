@@ -20,6 +20,14 @@ Route::get('/setup-db', function () {
     }
 });
 
+Route::get('/debug-db-users', function () {
+    try {
+        return \App\Models\User::all();
+    } catch (\Exception $e) {
+        return "Error: " . $e->getMessage();
+    }
+});
+
 // =============================================
 // Self-Healing Migration (Otomatis Setup DB)
 // =============================================

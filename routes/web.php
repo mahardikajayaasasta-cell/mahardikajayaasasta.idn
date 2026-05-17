@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Auth;
 Route::get('/setup-db', function () {
     try {
         \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        return "Database berhasil di-migrate! <a href='/'>Klik di sini untuk Login</a>";
+        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+        return "Database berhasil di-migrate dan di-seed! <a href='/'>Klik di sini untuk Login</a>";
     } catch (\Exception $e) {
         return "Error saat menjalankan setup: " . $e->getMessage();
     }

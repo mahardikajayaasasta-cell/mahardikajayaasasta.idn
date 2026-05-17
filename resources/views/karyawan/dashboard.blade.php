@@ -40,6 +40,8 @@
             'Hadir'   => ['bg' => 'from-emerald-500 to-teal-500', 'badge' => 'bg-emerald-100 text-emerald-700'],
             'Telat'   => ['bg' => 'from-amber-500 to-orange-500', 'badge' => 'bg-amber-100 text-amber-700'],
             'Mangkir' => ['bg' => 'from-red-500 to-rose-500', 'badge' => 'bg-red-100 text-red-700'],
+            'Izin'    => ['bg' => 'from-blue-500 to-indigo-500', 'badge' => 'bg-blue-100 text-blue-700'],
+            'Sakit'   => ['bg' => 'from-purple-500 to-violet-500', 'badge' => 'bg-purple-100 text-purple-700'],
             default   => ['bg' => 'from-slate-400 to-slate-500', 'badge' => 'bg-slate-100 text-slate-600'],
         };
     @endphp
@@ -100,9 +102,12 @@
                         {{ $rec->clock_out?->format('H:i') ?? '—' }}
                     </p>
                 </div>
-                <span class="text-xs font-semibold px-3 py-1 rounded-full
-                    {{ $rec->status === 'Hadir' ? 'bg-emerald-100 text-emerald-700' :
-                       ($rec->status === 'Telat' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700') }}">
+                <span class="text-xs font-bold px-3 py-1 rounded-full
+                    {{ $rec->status === 'Hadir' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                       ($rec->status === 'Telat' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                       ($rec->status === 'Izin' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
+                       ($rec->status === 'Sakit' ? 'bg-purple-50 text-purple-700 border border-purple-200' :
+                       'bg-rose-50 text-rose-700 border border-rose-200'))) }}">
                     {{ $rec->status }}
                 </span>
             </div>

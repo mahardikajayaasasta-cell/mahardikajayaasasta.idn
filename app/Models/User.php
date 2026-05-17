@@ -53,6 +53,11 @@ class User extends Authenticatable
         return $this->hasMany(Attendance::class);
     }
 
+    public function leaves(): HasMany
+    {
+        return $this->hasMany(Leave::class);
+    }
+
     // =============================================
     // Scopes
     // =============================================

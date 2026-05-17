@@ -51,6 +51,8 @@
                     <option value="Hadir" {{ $status === 'Hadir' ? 'selected' : '' }}>Hadir</option>
                     <option value="Telat" {{ $status === 'Telat' ? 'selected' : '' }}>Telat</option>
                     <option value="Mangkir" {{ $status === 'Mangkir' ? 'selected' : '' }}>Mangkir</option>
+                    <option value="Izin" {{ $status === 'Izin' ? 'selected' : '' }}>Izin</option>
+                    <option value="Sakit" {{ $status === 'Sakit' ? 'selected' : '' }}>Sakit</option>
                 </select>
             </div>
         </div>
@@ -92,9 +94,12 @@
                         <td class="px-4 py-3 text-slate-600 font-mono text-xs">{{ $att->clock_out?->format('H:i:s') ?? '—' }}</td>
                         <td class="px-4 py-3 text-slate-600 text-xs">{{ $att->location?->name ?? '—' }}</td>
                         <td class="px-4 py-3">
-                            <span class="px-2.5 py-1 rounded-full text-xs font-semibold
-                                {{ $att->status === 'Hadir' ? 'bg-emerald-100 text-emerald-700' :
-                                   ($att->status === 'Telat' ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700') }}">
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold
+                                {{ $att->status === 'Hadir' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                                   ($att->status === 'Telat' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                                   ($att->status === 'Izin' ? 'bg-blue-50 text-blue-700 border border-blue-200' :
+                                   ($att->status === 'Sakit' ? 'bg-purple-50 text-purple-700 border border-purple-200' :
+                                   'bg-rose-50 text-rose-700 border border-rose-200'))) }}">
                                 {{ $att->status }}
                             </span>
                         </td>

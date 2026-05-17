@@ -114,6 +114,10 @@ Route::middleware(['auth', 'karyawan'])->prefix('karyawan')->name('karyawan.')->
     // Riwayat
     Route::get('/riwayat', [AttendanceController::class, 'history'])->name('riwayat');
 
+    // Pengajuan Izin & Sakit
+    Route::get('/izin', [\App\Http\Controllers\LeaveController::class, 'index'])->name('izin');
+    Route::post('/izin', [\App\Http\Controllers\LeaveController::class, 'store'])->name('izin.store');
+
     // Profile
     Route::get('/profile', [\App\Http\Controllers\KaryawanProfileController::class, 'edit'])->name('profile');
     Route::put('/profile', [\App\Http\Controllers\KaryawanProfileController::class, 'update'])->name('profile.update');
@@ -134,6 +138,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/rekap', [AdminAttendanceController::class, 'rekap'])->name('rekap');
     Route::get('/rekap/{attendance}', [AdminAttendanceController::class, 'show'])->name('rekap.show');
     Route::patch('/rekap/{attendance}/status', [AdminAttendanceController::class, 'updateStatus'])->name('rekap.status');
+
+    // Verifikasi Izin & Sakit
+    Route::get('/izin', [\App\Http\Controllers\Admin\AdminLeaveController::class, 'index'])->name('izin.index');
+    Route::patch('/izin/{leave}/verify', [\App\Http\Controllers\Admin\AdminLeaveController::class, 'verify'])->name('izin.verify');
 
     // Export
     Route::get('/rekap/export/excel', [AdminAttendanceController::class, 'exportExcel'])->name('export.excel');

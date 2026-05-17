@@ -80,6 +80,10 @@
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                     <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Manajemen Lokasi</span>
                 </a>
+                <a href="{{ route('admin.izin.index') }}" class="nav-link {{ request()->routeIs('admin.izin*') ? 'active' : '' }}" title="Verifikasi Izin">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Verifikasi Izin</span>
+                </a>
             @else
                 <p class="text-[10px] font-semibold text-slate-500 uppercase tracking-wider px-3 mb-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">Menu Utama</p>
                 <a href="{{ route('karyawan.dashboard') }}" class="nav-link {{ request()->routeIs('karyawan.dashboard') ? 'active' : '' }}" title="Dashboard">
@@ -93,6 +97,10 @@
                 <a href="{{ route('karyawan.riwayat') }}" class="nav-link {{ request()->routeIs('karyawan.riwayat') ? 'active' : '' }}" title="Riwayat Absensi">
                     <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                     <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Riwayat Absensi</span>
+                </a>
+                <a href="{{ route('karyawan.izin') }}" class="nav-link {{ request()->routeIs('karyawan.izin*') ? 'active' : '' }}" title="Pengajuan Izin">
+                    <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <span class="opacity-0 group-hover:opacity-100 transition-opacity duration-300">Pengajuan Izin</span>
                 </a>
             @endif
         </nav>
@@ -161,11 +169,13 @@
                     <a href="{{ route('admin.rekap') }}" class="nav-link {{ request()->routeIs('admin.rekap*') ? 'active' : '' }}">Rekap Absensi</a>
                     <a href="{{ route('admin.karyawan.index') }}" class="nav-link {{ request()->routeIs('admin.karyawan*') ? 'active' : '' }}">Karyawan</a>
                     <a href="{{ route('admin.lokasi.index') }}" class="nav-link {{ request()->routeIs('admin.lokasi*') ? 'active' : '' }}">Lokasi Kerja</a>
+                    <a href="{{ route('admin.izin.index') }}" class="nav-link {{ request()->routeIs('admin.izin*') ? 'active' : '' }}">Verifikasi Izin</a>
                     <a href="{{ route('admin.profile') }}" class="nav-link {{ request()->routeIs('admin.profile') ? 'active' : '' }}">Pengaturan Profile</a>
                 @else
                     <a href="{{ route('karyawan.dashboard') }}" class="nav-link {{ request()->routeIs('karyawan.dashboard') ? 'active' : '' }}">Dashboard</a>
                     <a href="{{ route('karyawan.absensi') }}" class="nav-link {{ request()->routeIs('karyawan.absensi') ? 'active' : '' }}">Absensi</a>
                     <a href="{{ route('karyawan.riwayat') }}" class="nav-link {{ request()->routeIs('karyawan.riwayat') ? 'active' : '' }}">Riwayat</a>
+                    <a href="{{ route('karyawan.izin') }}" class="nav-link {{ request()->routeIs('karyawan.izin*') ? 'active' : '' }}">Pengajuan Izin</a>
                     <a href="{{ route('karyawan.profile') }}" class="nav-link {{ request()->routeIs('karyawan.profile') ? 'active' : '' }}">Pengaturan Profile</a>
                 @endif
                 <form method="POST" action="{{ route('logout') }}" class="mt-6 border-t border-slate-700 pt-4">

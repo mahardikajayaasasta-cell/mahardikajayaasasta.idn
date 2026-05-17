@@ -99,10 +99,12 @@ class Attendance extends Model
     public function getStatusBadgeColorAttribute(): string
     {
         return match($this->status) {
-            'Hadir'  => 'green',
-            'Telat'  => 'yellow',
+            'Hadir'   => 'green',
+            'Telat'   => 'yellow',
             'Mangkir' => 'red',
-            default  => 'gray',
+            'Izin'    => 'blue',
+            'Sakit'   => 'purple',
+            default   => 'gray',
         };
     }
 }

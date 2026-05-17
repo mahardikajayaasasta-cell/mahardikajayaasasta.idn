@@ -20,28 +20,6 @@ Route::get('/setup-db', function () {
     }
 });
 
-Route::get('/debug-db-users', function () {
-    try {
-        return \App\Models\User::all();
-    } catch (\Exception $e) {
-        return "Error: " . $e->getMessage();
-    }
-});
-
-Route::get('/reset-admin-password', function () {
-    try {
-        $admin = \App\Models\User::where('email', 'admin@absensi.app')->first();
-        if ($admin) {
-            $admin->password = \Illuminate\Support\Facades\Hash::make('password');
-            $admin->save();
-            return "Password admin berhasil di-reset menjadi 'password'!";
-        }
-        return "Admin tidak ditemukan.";
-    } catch (\Exception $e) {
-        return "Error: " . $e->getMessage();
-    }
-});
-
 // =============================================
 // Self-Healing Migration (Otomatis Setup DB)
 // =============================================

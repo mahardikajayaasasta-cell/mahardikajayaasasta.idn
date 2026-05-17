@@ -36,6 +36,7 @@
         "LOG_LEVEL": "error",
         "DB_CONNECTION": "mysql",
         "SESSION_DRIVER": "cookie",
+        "SESSION_SECURE_COOKIE": "true",
         "FILESYSTEM_DISK": "cloudinary"
     }
 }

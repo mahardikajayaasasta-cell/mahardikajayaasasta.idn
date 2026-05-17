@@ -18,7 +18,7 @@ return [
     |
     */
 
-    'driver' => env('SESSION_DRIVER', 'database'),
+    'driver' => (isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL_URL'])) ? 'cookie' : env('SESSION_DRIVER', 'database'),
 
     /*
     |--------------------------------------------------------------------------
@@ -169,7 +169,7 @@ return [
     |
     */
 
-    'secure' => env('SESSION_SECURE_COOKIE'),
+    'secure' => (isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL_URL'])) ? true : env('SESSION_SECURE_COOKIE', false),
 
     /*
     |--------------------------------------------------------------------------

@@ -4,10 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'Sistem Absensi') — AbsensiApp</title>
-    <meta name="description" content="Sistem Absensi Berbasis Web dengan GPS dan Kamera">
+    <title>@yield('title', 'Sistem Absensi') — MJA Absensi</title>
+    <meta name="description" content="Sistem Absensi Mahardika Jaya Asasta Berbasis Web dengan GPS dan Kamera">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:300,400,500,600,700,800&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/jpeg" href="{{ asset('logo-mja.jpg') }}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @stack('head')
@@ -15,27 +16,47 @@
 <body class="h-full bg-slate-50 font-['Inter']">
 
 <!-- Global Loading Overlay -->
-<div id="global-loader" class="fixed inset-0 z-[9999] flex items-center justify-center bg-white/80 backdrop-blur-sm transition-opacity duration-300 pointer-events-none opacity-0">
+<div id="global-loader" class="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-900/90 backdrop-blur-md transition-opacity duration-300 pointer-events-none opacity-0">
     <div class="flex flex-col items-center">
-        <div class="w-12 h-12 border-4 border-blue-600/20 border-t-blue-600 rounded-full animate-spin"></div>
-        <p class="mt-4 text-sm font-bold text-slate-700 tracking-wider animate-pulse">MEMUAT...</p>
+        <!-- Pulse & Scale logo container -->
+        <div class="relative w-28 h-28 mb-4 flex items-center justify-center">
+            <!-- Ripple rings around logo -->
+            <div class="absolute inset-0 rounded-full bg-amber-500/20 animate-ping opacity-75"></div>
+            <div class="absolute -inset-4 rounded-full border-2 border-dashed border-amber-500/40 animate-[spin_12s_linear_infinite]"></div>
+            <!-- Logo itself inside card-like circle with shadow -->
+            <div class="relative w-20 h-20 bg-white rounded-full p-1.5 shadow-2xl flex items-center justify-center overflow-hidden border border-amber-400">
+                <img src="{{ asset('logo-mja.jpg') }}" alt="MJA Logo" class="w-full h-full object-contain">
+            </div>
+        </div>
+        <!-- Loading progress indicator -->
+        <h2 class="text-sm font-bold text-white tracking-widest uppercase mb-1">Mahardika Jaya Asasta</h2>
+        <div class="w-40 h-1 bg-slate-800 rounded-full overflow-hidden mb-2">
+            <div class="h-full bg-gradient-to-r from-amber-400 to-amber-600 rounded-full w-0 animate-[loading_2s_ease-in-out_infinite]"></div>
+        </div>
+        <p class="text-[10px] font-medium text-slate-400 tracking-wider">Memuat Halaman...</p>
     </div>
 </div>
+
+<style>
+@keyframes loading {
+    0% { width: 0%; margin-left: 0%; }
+    50% { width: 60%; margin-left: 20%; }
+    100% { width: 0%; margin-left: 100%; }
+}
+</style>
 
 <!-- Sidebar -->
 <div class="flex h-full">
     <!-- Sidebar (desktop) -->
     <aside id="sidebar" class="hidden lg:flex lg:flex-col lg:w-20 hover:lg:w-64 group bg-gradient-to-b from-slate-900 to-slate-800 text-white fixed inset-y-0 left-0 z-50 shadow-2xl transition-all duration-300 overflow-hidden">
         <!-- Logo -->
-        <div class="flex items-center gap-3 px-5 py-5 border-b border-slate-700">
-            <div class="w-10 h-10 shrink-0 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg">
-                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
+        <div class="flex items-center gap-3 px-4 py-4 border-b border-slate-700">
+            <div class="w-12 h-12 shrink-0 bg-white rounded-xl flex items-center justify-center shadow-lg border border-slate-700 overflow-hidden">
+                <img src="{{ asset('logo-mja.jpg') }}" alt="MJA Logo" class="w-full h-full object-cover">
             </div>
             <div class="opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap">
-                <h1 class="text-base font-bold text-white leading-tight">AbsensiApp</h1>
-                <p class="text-xs text-slate-400">GPS & Kamera</p>
+                <h1 class="text-sm font-bold text-white leading-tight">MJA Absensi</h1>
+                <p class="text-[10px] text-slate-400">Mahardika Jaya Asasta</p>
             </div>
         </div>
 
@@ -110,10 +131,10 @@
             </button>
 
             <div class="flex items-center gap-2">
-                <div class="w-7 h-7 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-lg flex items-center justify-center">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="w-8 h-8 bg-white rounded-lg flex items-center justify-center overflow-hidden border border-slate-200 shadow-sm">
+                    <img src="{{ asset('logo-mja.jpg') }}" alt="MJA Logo" class="w-full h-full object-cover">
                 </div>
-                <span class="font-bold text-slate-800 text-sm">AbsensiApp</span>
+                <span class="font-bold text-slate-800 text-sm">MJA Absensi</span>
             </div>
             <div class="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shadow-sm">
                 @if(auth()->user()->profile_photo_url)
@@ -129,10 +150,10 @@
         <aside id="mobile-sidebar" class="fixed inset-y-0 left-0 w-64 bg-gradient-to-b from-slate-900 to-slate-800 text-white z-50 transform -translate-x-full transition-transform duration-300 lg:hidden shadow-2xl">
             <!-- same content as desktop sidebar, simplified -->
             <div class="flex items-center gap-3 px-6 py-5 border-b border-slate-700">
-                <div class="w-8 h-8 shrink-0 bg-gradient-to-br from-blue-400 to-indigo-600 rounded-lg flex items-center justify-center">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <div class="w-9 h-9 shrink-0 bg-white rounded-lg flex items-center justify-center overflow-hidden border border-slate-700 shadow-lg">
+                    <img src="{{ asset('logo-mja.jpg') }}" alt="MJA Logo" class="w-full h-full object-cover">
                 </div>
-                <span class="font-bold text-white whitespace-nowrap">AbsensiApp</span>
+                <span class="font-bold text-white whitespace-nowrap">MJA Absensi</span>
             </div>
             <nav class="px-4 py-6 space-y-2">
                 @if(auth()->user()->isAdmin())

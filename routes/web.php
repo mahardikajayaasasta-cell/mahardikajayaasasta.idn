@@ -20,6 +20,16 @@ Route::get('/setup-db', function () {
     }
 });
 
+Route::get('/run-migration', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
+        $output = \Illuminate\Support\Facades\Artisan::output();
+        return "Migration completed successfully!<br><pre>" . $output . "</pre>";
+    } catch (\Exception $e) {
+        return "Migration failed: " . $e->getMessage();
+    }
+});
+
 // =============================================
 // Self-Healing Migration (Otomatis Setup DB)
 // =============================================

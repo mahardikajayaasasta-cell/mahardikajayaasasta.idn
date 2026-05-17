@@ -25,10 +25,24 @@ Route::get('/debug-amanda', function() {
     if (!$user) {
         return "User not found";
     }
+    
+    // Find a unique KRY NIP
+    $nip = 'KRY002';
+    $counter = 2;
+    while (\App\Models\User::where('employee_id', $nip)->exists()) {
+        $counter++;
+        $nip = 'KRY' . str_pad($counter, 3, '0', STR_PAD_LEFT);
+    }
+    
+    $oldNip = $user->employee_id;
+    $user->update(['employee_id' => $nip]);
+    
     return [
+        'status' => 'Updated',
         'id' => $user->id,
         'name' => $user->name,
-        'employee_id' => $user->employee_id,
+        'old_employee_id' => $oldNip,
+        'new_employee_id' => $user->employee_id,
         'email' => $user->email,
     ];
 });

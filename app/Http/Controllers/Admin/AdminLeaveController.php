@@ -52,22 +52,22 @@ class AdminLeaveController
                         'date' => $dateStr,
                     ],
                     [
-                        'status' => $leave->type === 'izin' ? 'Izin' : 'Sakit',
-                        'notes' => 'Pengajuan ' . ($leave->type === 'izin' ? 'Izin' : 'Sakit') . ' disetujui Admin. Alasan: ' . $leave->reason,
+                        'status' => $leave->type === 'izin' ? 'Izin' : ($leave->type === 'sakit' ? 'Sakit' : 'Cuti'),
+                        'notes' => 'Pengajuan ' . ucfirst($leave->type) . ' disetujui Admin. Alasan: ' . $leave->reason,
                     ]
                 );
             } else {
-                // Jika ditolak, hapus catatan kehadiran otomatis yang bertipe Izin/Sakit
+                // Jika ditolak, hapus catatan kehadiran otomatis yang bertipe Izin/Sakit/Cuti
                 $attendance = Attendance::where('user_id', $leave->user_id)
                     ->whereDate('date', $dateStr)
                     ->first();
                     
-                if ($attendance && in_array($attendance->status, ['Izin', 'Sakit'])) {
+                if ($attendance && in_array($attendance->status, ['Izin', 'Sakit', 'Cuti'])) {
                     $attendance->delete();
                 }
             }
 
-            return redirect()->route('admin.izin.index')->with('success', 'Pengajuan izin/sakit berhasil diverifikasi.');
+            return redirect()->route('admin.izin.index')->with('success', 'Pengajuan izin/sakit/cuti berhasil diverifikasi.');
         } catch (\Exception $e) {
             Log::error('Admin Leave Verification Error: ' . $e->getMessage());
             return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);

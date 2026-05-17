@@ -1,15 +1,52 @@
 @extends('layouts.app')
 
-@section('title', 'Pengajuan Izin & Sakit')
+@section('title', 'Pengajuan Izin, Sakit & Cuti')
 
 @section('content')
 <div class="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
     <div>
-        <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Pengajuan Izin & Sakit</h1>
-        <p class="text-sm text-slate-500">Ajukan surat izin atau keterangan sakit dengan mudah dan praktis.</p>
+        <h1 class="text-2xl font-extrabold text-slate-800 tracking-tight">Pengajuan Cuti, Izin & Sakit</h1>
+        <p class="text-sm text-slate-500">Ajukan cuti tahunan, surat izin, atau keterangan sakit secara praktis.</p>
     </div>
     <div class="flex items-center gap-2 bg-slate-100 p-1.5 rounded-xl border border-slate-200 text-xs text-slate-600 font-medium">
         <span class="px-2.5 py-1 bg-white rounded-lg shadow-sm border border-slate-200">Zona Waktu: Asia/Jakarta (WIB)</span>
+    </div>
+</div>
+
+<!-- Quota Widget -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-5 text-white shadow-lg flex items-center justify-between relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 80% 20%, white 1px, transparent 1px); background-size: 20px 20px;"></div>
+        <div class="relative">
+            <p class="text-xs text-white/80 font-medium uppercase tracking-wider">Jatah Cuti Tahunan</p>
+            <h3 class="text-3xl font-extrabold mt-1">12 Hari</h3>
+            <p class="text-[10px] text-white/60 mt-1">Batas permanen per tahun kalender</p>
+        </div>
+        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center relative z-10">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+        </div>
+    </div>
+    <div class="bg-gradient-to-r from-amber-500 to-orange-500 rounded-2xl p-5 text-white shadow-lg flex items-center justify-between relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 80% 20%, white 1px, transparent 1px); background-size: 20px 20px;"></div>
+        <div class="relative">
+            <p class="text-xs text-white/80 font-medium uppercase tracking-wider">Cuti Terpakai</p>
+            <h3 class="text-3xl font-extrabold mt-1">{{ $usedCuti }} Hari</h3>
+            <p class="text-[10px] text-white/60 mt-1">Termasuk disetujui & pending</p>
+        </div>
+        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center relative z-10">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        </div>
+    </div>
+    <div class="bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl p-5 text-white shadow-lg flex items-center justify-between relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 80% 20%, white 1px, transparent 1px); background-size: 20px 20px;"></div>
+        <div class="relative">
+            <p class="text-xs text-white/80 font-medium uppercase tracking-wider">Sisa Kuota Cuti</p>
+            <h3 class="text-3xl font-extrabold mt-1">{{ $remainingCuti }} Hari</h3>
+            <p class="text-[10px] text-white/60 mt-1">Sisa cuti untuk tahun {{ now()->year }}</p>
+        </div>
+        <div class="w-12 h-12 bg-white/10 rounded-2xl flex items-center justify-center relative z-10">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
     </div>
 </div>
 
@@ -44,19 +81,26 @@
                 <!-- Jenis Pengajuan -->
                 <div>
                     <label for="type" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">Jenis Pengajuan</label>
-                    <div class="grid grid-cols-2 gap-3">
-                        <label class="relative flex items-center justify-center p-3 rounded-2xl border-2 border-slate-200 cursor-pointer hover:bg-slate-50 transition-all checked-label">
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="relative flex items-center justify-center p-3 rounded-2xl border-2 border-slate-200 cursor-pointer hover:bg-slate-50 transition-all checked-label text-center">
                             <input type="radio" name="type" id="type-izin" value="izin" class="sr-only" checked onchange="toggleFormMode('izin')">
-                            <div class="text-center">
-                                <span class="block text-sm font-bold text-slate-800">Izin</span>
-                                <span class="block text-[10px] text-slate-400 mt-0.5">Keperluan pribadi</span>
+                            <div>
+                                <span class="block text-xs font-extrabold text-slate-800">Izin</span>
+                                <span class="block text-[8px] text-slate-400 mt-0.5">Keperluan</span>
                             </div>
                         </label>
-                        <label class="relative flex items-center justify-center p-3 rounded-2xl border-2 border-slate-200 cursor-pointer hover:bg-slate-50 transition-all checked-label">
+                        <label class="relative flex items-center justify-center p-3 rounded-2xl border-2 border-slate-200 cursor-pointer hover:bg-slate-50 transition-all checked-label text-center">
                             <input type="radio" name="type" id="type-sakit" value="sakit" class="sr-only" onchange="toggleFormMode('sakit')">
-                            <div class="text-center">
-                                <span class="block text-sm font-bold text-slate-800">Sakit</span>
-                                <span class="block text-[10px] text-slate-400 mt-0.5">Kondisi kurang sehat</span>
+                            <div>
+                                <span class="block text-xs font-extrabold text-slate-800">Sakit</span>
+                                <span class="block text-[8px] text-slate-400 mt-0.5">Sakit H-0</span>
+                            </div>
+                        </label>
+                        <label class="relative flex items-center justify-center p-3 rounded-2xl border-2 border-slate-200 cursor-pointer hover:bg-slate-50 transition-all checked-label text-center">
+                            <input type="radio" name="type" id="type-cuti" value="cuti" class="sr-only" onchange="toggleFormMode('cuti')">
+                            <div>
+                                <span class="block text-xs font-extrabold text-slate-800">Cuti</span>
+                                <span class="block text-[8px] text-slate-400 mt-0.5">Tahunan</span>
                             </div>
                         </label>
                     </div>
@@ -107,7 +151,7 @@
             <div class="px-6 py-5 border-b border-slate-100 flex items-center justify-between">
                 <div>
                     <h2 class="font-bold text-slate-800 text-base">Riwayat Pengajuan Anda</h2>
-                    <p class="text-slate-400 text-xs mt-0.5">Daftar pengajuan izin dan sakit yang telah Anda buat.</p>
+                    <p class="text-slate-400 text-xs mt-0.5">Daftar pengajuan izin, sakit, dan cuti yang telah Anda buat.</p>
                 </div>
             </div>
 
@@ -117,7 +161,7 @@
                         <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
                     </div>
                     <h3 class="text-sm font-bold text-slate-700">Belum Ada Pengajuan</h3>
-                    <p class="text-xs text-slate-400 mt-1">Anda belum pernah mengirim pengajuan izin atau sakit.</p>
+                    <p class="text-xs text-slate-400 mt-1">Anda belum pernah mengirim pengajuan cuti, izin atau sakit.</p>
                 </div>
             @else
                 <div class="overflow-x-auto">
@@ -141,6 +185,10 @@
                                         @if($leave->type === 'izin')
                                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200">
                                                 Izin Cuti
+                                            </span>
+                                        @elseif($leave->type === 'cuti')
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                                                Cuti Tahunan
                                             </span>
                                         @else
                                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-purple-50 text-purple-700 border border-purple-200">
@@ -243,10 +291,20 @@
             }
             dateHelper.innerHTML = `
                 <svg class="w-3.5 h-3.5 shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-                <span>Pengajuan izin (cuti/keperluan) wajib didaftarkan minimal H-1.</span>
+                <span>Pengajuan izin (keperluan) wajib didaftarkan minimal H-1.</span>
             `;
-            dateHelper.classList.remove('text-purple-600');
-            dateHelper.classList.add('text-amber-600');
+            dateHelper.className = 'text-[11px] font-medium mt-1.5 flex items-center gap-1 text-amber-600';
+        } else if (type === 'cuti') {
+            // Khusus Cuti: Minimal H-1 (besok)
+            dateInput.min = formatDate(tomorrow);
+            if (dateInput.value < formatDate(tomorrow)) {
+                dateInput.value = formatDate(tomorrow);
+            }
+            dateHelper.innerHTML = `
+                <svg class="w-3.5 h-3.5 shrink-0 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>Pengajuan cuti tahunan wajib didaftarkan minimal H-1.</span>
+            `;
+            dateHelper.className = 'text-[11px] font-medium mt-1.5 flex items-center gap-1 text-indigo-600';
         } else {
             // Sakit: Boleh hari ini (H-0)
             dateInput.min = formatDate(today);
@@ -254,8 +312,7 @@
                 <svg class="w-3.5 h-3.5 shrink-0 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                 <span>Pengajuan sakit dapat diajukan mulai hari ini (H-0).</span>
             `;
-            dateHelper.classList.remove('text-amber-600');
-            dateHelper.classList.add('text-purple-600');
+            dateHelper.className = 'text-[11px] font-medium mt-1.5 flex items-center gap-1 text-purple-600';
         }
         
         updateRadioStyles();

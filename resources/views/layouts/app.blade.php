@@ -238,8 +238,12 @@ window.addEventListener('beforeunload', () => {
 // Show loader on form submissions
 document.querySelectorAll('form').forEach(form => {
     form.addEventListener('submit', () => {
-        // Jangan tampilkan loader jika form memiliki data-no-loader
-        if (!form.hasAttribute('data-no-loader')) {
+        // Jangan tampilkan loader jika form memiliki data-no-loader, .delete-form, atau .verify-form
+        if (
+            !form.hasAttribute('data-no-loader') && 
+            !form.classList.contains('delete-form') && 
+            !form.classList.contains('verify-form')
+        ) {
             loader.classList.remove('opacity-0', 'pointer-events-none');
             loader.classList.add('opacity-100');
         }
@@ -293,6 +297,12 @@ document.querySelectorAll('.delete-form').forEach(form => {
             }
         }).then((result) => {
             if (result.isConfirmed) {
+                // Tampilkan loader secara manual setelah dikonfirmasi
+                const loaderEl = document.getElementById('global-loader');
+                if (loaderEl) {
+                    loaderEl.classList.remove('opacity-0', 'pointer-events-none');
+                    loaderEl.classList.add('opacity-100');
+                }
                 this.submit();
             }
         });

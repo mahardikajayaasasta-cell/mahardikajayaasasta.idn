@@ -228,6 +228,12 @@
                 }
             }).then((result) => {
                 if (result.isConfirmed) {
+                    // Tampilkan loader secara manual setelah dikonfirmasi
+                    const loaderEl = document.getElementById('global-loader');
+                    if (loaderEl) {
+                        loaderEl.classList.remove('opacity-0', 'pointer-events-none');
+                        loaderEl.classList.add('opacity-100');
+                    }
                     this.submit();
                 }
             });

@@ -5,110 +5,138 @@
     <title>Rekap Absensi {{ $dateFrom }} s/d {{ $dateTo }}</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'DejaVu Sans', sans-serif; font-size: 10px; color: #1e293b; }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; color: #333; padding: 30px; }
 
-        .header { background: linear-gradient(135deg, #1e3a5f, #2563eb); color: white; padding: 18px 20px; margin-bottom: 16px; border-radius: 4px; }
-        .header h1 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-        .header p { font-size: 9px; opacity: 0.8; }
+        /* KOP SURAT */
+        .kop-surat { width: 100%; border-bottom: 3px solid #1e3a8a; padding-bottom: 12px; margin-bottom: 25px; text-align: center; }
+        .kop-surat h1 { font-size: 22px; font-weight: 800; color: #1e3a8a; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
+        .kop-surat p { font-size: 11px; color: #475569; line-height: 1.4; }
 
-        .meta { display: flex; justify-content: space-between; margin-bottom: 14px; font-size: 9px; color: #64748b; }
+        /* LAPORAN TITLE */
+        .report-title { text-align: center; margin-bottom: 25px; }
+        .report-title h2 { font-size: 16px; font-weight: 700; text-decoration: underline; margin-bottom: 5px; text-transform: uppercase; }
+        .report-title p { font-size: 11px; color: #64748b; }
 
-        table { width: 100%; border-collapse: collapse; }
-        thead { background: #1e3a5f; color: white; }
-        thead th { padding: 7px 8px; text-align: left; font-size: 9px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
-        tbody tr:nth-child(even) { background: #f8fafc; }
-        tbody tr:hover { background: #eff6ff; }
-        tbody td { padding: 6px 8px; border-bottom: 1px solid #e2e8f0; vertical-align: middle; }
+        /* SUMMARY / STATISTICS */
+        .summary-container { width: 100%; margin-bottom: 20px; }
+        .summary-table { width: 60%; border-collapse: collapse; margin: 0 auto; }
+        .summary-table th, .summary-table td { padding: 8px 12px; font-size: 11px; border: 1px solid #cbd5e1; text-align: center; }
+        .summary-table th { background-color: #f1f5f9; font-weight: bold; color: #334155; }
+        
+        .badge-hadir { color: #166534; font-weight:bold; }
+        .badge-telat { color: #9a3412; font-weight:bold; }
+        .badge-mangkir { color: #991b1b; font-weight:bold; }
 
-        .badge { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 8px; font-weight: 700; }
-        .badge-hadir { background: #d1fae5; color: #065f46; }
-        .badge-telat { background: #fef3c7; color: #92400e; }
-        .badge-mangkir { background: #fee2e2; color: #991b1b; }
+        /* DATA TABLE */
+        .data-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        .data-table thead { background-color: #1e3a8a; color: #ffffff; }
+        .data-table th { padding: 9px 6px; text-align: center; font-size: 10px; font-weight: bold; border: 1px solid #94a3b8; text-transform: uppercase;}
+        .data-table td { padding: 8px 6px; border: 1px solid #cbd5e1; font-size: 10px; text-align: center; vertical-align: middle; }
+        .data-table tbody tr:nth-child(even) { background-color: #f8fafc; }
+        .data-table tbody tr:nth-child(odd) { background-color: #ffffff; }
 
-        .footer { margin-top: 16px; text-align: right; font-size: 8px; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 8px; }
+        .text-left { text-align: left !important; }
 
-        .summary { display: flex; gap: 12px; margin-bottom: 14px; }
-        .summary-card { flex: 1; padding: 10px 12px; border-radius: 4px; }
-        .summary-card.green { background: #d1fae5; }
-        .summary-card.yellow { background: #fef3c7; }
-        .summary-card.red { background: #fee2e2; }
-        .summary-card p.num { font-size: 18px; font-weight: 700; }
-        .summary-card p.lbl { font-size: 8px; opacity: 0.7; }
+        /* TTD / SIGNATURE AREA */
+        .signature-area { width: 100%; margin-top: 40px; }
+        .signature-box { float: right; width: 250px; text-align: center; }
+        .signature-box p { margin-bottom: 70px; font-size: 12px; }
+        .signature-box strong { font-size: 12px; text-decoration: underline; display: block; margin-bottom: 3px; }
+        .signature-box span { font-size: 11px; color: #475569; }
+        
+        /* FOOTER */
+        .footer { font-size: 9px; color: #94a3b8; text-align: left; margin-top: 60px; border-top: 1px solid #cbd5e1; padding-top: 10px; clear: both;}
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Rekap Absensi Karyawan</h1>
-        <p>Periode: {{ \Carbon\Carbon::parse($dateFrom)->translatedFormat('d F Y') }} s/d {{ \Carbon\Carbon::parse($dateTo)->translatedFormat('d F Y') }}</p>
+
+    <div class="kop-surat">
+        <h1>PT MAHARDIKA JAYA ASASTA</h1>
+        <p>Gedung Mahardika Lt.3, Jl. Surya Kencana No. 1, Pamulang, Tangerang Selatan, Banten<br>
+        Telp: (021) 12345678 | Email: hrd@mahardikajayaasasta.com | Web: www.mahardikajayaasasta.com</p>
     </div>
 
-    <div class="meta">
-        <span>Dicetak oleh: {{ auth()->user()->name }}</span>
-        <span>Tanggal cetak: {{ $printedAt }}</span>
+    <div class="report-title">
+        <h2>REKAPITULASI ABSENSI KARYAWAN</h2>
+        <p>Periode: <strong>{{ \Carbon\Carbon::parse($dateFrom)->translatedFormat('d F Y') }}</strong> s.d <strong>{{ \Carbon\Carbon::parse($dateTo)->translatedFormat('d F Y') }}</strong></p>
     </div>
 
-    <!-- Summary -->
     @php
         $hadir = $attendances->where('status', 'Hadir')->count();
         $telat = $attendances->where('status', 'Telat')->count();
         $mangkir = $attendances->where('status', 'Mangkir')->count();
+        $total = $attendances->count();
     @endphp
-    <div class="summary">
-        <div class="summary-card green">
-            <p class="num">{{ $hadir }}</p>
-            <p class="lbl">Hadir</p>
-        </div>
-        <div class="summary-card yellow">
-            <p class="num">{{ $telat }}</p>
-            <p class="lbl">Telat</p>
-        </div>
-        <div class="summary-card red">
-            <p class="num">{{ $mangkir }}</p>
-            <p class="lbl">Mangkir</p>
-        </div>
-        <div class="summary-card" style="background:#f1f5f9">
-            <p class="num">{{ $attendances->count() }}</p>
-            <p class="lbl">Total Record</p>
-        </div>
+
+    <div class="summary-container">
+        <table class="summary-table">
+            <thead>
+                <tr>
+                    <th>TOTAL HADIR</th>
+                    <th>TOTAL TERLAMBAT</th>
+                    <th>TOTAL MANGKIR</th>
+                    <th>TOTAL DATA</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><span class="badge-hadir">{{ $hadir }}</span></td>
+                    <td><span class="badge-telat">{{ $telat }}</span></td>
+                    <td><span class="badge-mangkir">{{ $mangkir }}</span></td>
+                    <td><strong>{{ $total }}</strong></td>
+                </tr>
+            </tbody>
+        </table>
     </div>
 
-    <table>
+    <table class="data-table">
         <thead>
             <tr>
-                <th>No</th>
-                <th>NIP</th>
-                <th>Nama Karyawan</th>
-                <th>Departemen</th>
-                <th>Tanggal</th>
-                <th>Jam Masuk</th>
-                <th>Jam Pulang</th>
-                <th>Lokasi</th>
-                <th>Status</th>
-                <th>Jarak (m)</th>
+                <th width="4%">NO</th>
+                <th width="12%">TANGGAL</th>
+                <th width="12%">NIP</th>
+                <th width="18%" class="text-left">NAMA LENGKAP</th>
+                <th width="10%">JAM MASUK</th>
+                <th width="10%">JAM PULANG</th>
+                <th width="14%">TITIK LOKASI</th>
+                <th width="10%">JARAK (m)</th>
+                <th width="10%">STATUS</th>
             </tr>
         </thead>
         <tbody>
-            @foreach($attendances as $i => $att)
+            @forelse($attendances as $i => $att)
             <tr>
                 <td>{{ $i + 1 }}</td>
-                <td>{{ $att->user->employee_id ?? '—' }}</td>
-                <td>{{ $att->user->name }}</td>
-                <td>{{ $att->user->department ?? '—' }}</td>
                 <td>{{ $att->date->format('d/m/Y') }}</td>
-                <td>{{ $att->clock_in?->format('H:i:s') ?? '—' }}</td>
-                <td>{{ $att->clock_out?->format('H:i:s') ?? '—' }}</td>
-                <td>{{ $att->location?->name ?? '—' }}</td>
+                <td>{{ $att->user->employee_id ?? '-' }}</td>
+                <td class="text-left"><strong>{{ $att->user->name }}</strong></td>
+                <td>{{ $att->clock_in?->format('H:i') ?? '-' }}</td>
+                <td>{{ $att->clock_out?->format('H:i') ?? '-' }}</td>
+                <td>{{ $att->location?->name ?? 'Luar Kantor' }}</td>
+                <td>{{ $att->clock_in_distance ? number_format($att->clock_in_distance, 0) : '-' }}</td>
                 <td>
-                    <span class="badge badge-{{ strtolower($att->status) }}">{{ $att->status }}</span>
+                    <span class="badge-{{ strtolower($att->status) }}">{{ strtoupper($att->status) }}</span>
                 </td>
-                <td>{{ $att->clock_in_distance ? number_format($att->clock_in_distance, 0) : '—' }}</td>
             </tr>
-            @endforeach
+            @empty
+            <tr>
+                <td colspan="9" style="text-align:center; padding:20px; color:#64748b;">Tidak ada data absensi untuk periode yang dipilih.</td>
+            </tr>
+            @endforelse
         </tbody>
     </table>
 
-    <div class="footer">
-        AbsensiApp — Sistem Absensi Berbasis GPS & Kamera | {{ $printedAt }}
+    <div class="signature-area">
+        <div class="signature-box">
+            <p>Pamulang, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}<br>Mengetahui,</p>
+            <strong>Manager HRD PT MJA</strong>
+            <span>( .................................................. )</span>
+        </div>
     </div>
+
+    <div class="footer">
+        Dicetak secara otomatis oleh <strong>Sistem Absensi MJA (Cloud Server)</strong> | Oleh: {{ auth()->user()->name }} | Waktu Cetak: {{ $printedAt }} WIB
+    </div>
+
 </body>
 </html>

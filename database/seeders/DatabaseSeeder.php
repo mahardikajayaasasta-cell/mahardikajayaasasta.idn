@@ -44,29 +44,30 @@ class DatabaseSeeder extends Seeder
             'employee_id' => 'KRY002',
             'department'  => 'HR',
             'position'    => 'HR Officer',
-            'phone'       => '08198765432',
+            'phone'       => '08123456780',
             'is_active'   => true,
         ]);
 
-        // Sample Lokasi Kantor (Jakarta Pusat - Monas area)
+        // Lokasi Pertama: Kantor Pusat (Pondok Kacang)
         Location::create([
-            'name'       => 'Kantor Pusat',
-            'address'    => 'Jl. Medan Merdeka Barat, Jakarta Pusat',
-            'latitude'   => -6.1751,
-            'longitude'  => 106.8272,
-            'radius'     => 100,
+            'name'       => 'Kantor Pusat PT MJA (Pd. Kacang)',
+            'address'    => 'Jl. Pd. Kacang, RT.001/RW003/RW.No.75, Pd. Kacang Bar., Kec. Pd. Aren, Kota Tangerang Selatan, Banten',
+            'latitude'   => -6.265000, // Koordinat Pondok Kacang Barat
+            'longitude'  => 106.716000, 
+            'radius'     => 150,       // Radius toleransi 150 meter
             'work_start' => '08:00:00',
             'work_end'   => '17:00:00',
             'late_after' => '08:30:00',
             'is_active'  => true,
         ]);
 
+        // Lokasi Kedua: Cabang / Pendidikan (Universitas Pamulang)
         Location::create([
-            'name'       => 'Kantor Cabang Selatan',
-            'address'    => 'Jl. TB Simatupang, Jakarta Selatan',
-            'latitude'   => -6.2908,
-            'longitude'  => 106.7794,
-            'radius'     => 150,
+            'name'       => 'Cabang Universitas Pamulang',
+            'address'    => 'Jl. Surya Kencana No.1, Pamulang Barat, Kec. Pamulang, Kota Tangerang Selatan',
+            'latitude'   => -6.342110,  // Koordinat Universitas Pamulang (Pusat)
+            'longitude'  => 106.741005,
+            'radius'     => 300,        // Radius toleransi diperbesar untuk area kampus luas (300 meter)
             'work_start' => '08:00:00',
             'work_end'   => '17:00:00',
             'late_after' => '08:30:00',

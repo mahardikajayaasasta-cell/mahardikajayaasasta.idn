@@ -1,0 +1,25 @@
+name: Keep Vercel Alive
+
+on:
+  schedule:
+    # Run every 10 minutes to prevent Vercel Serverless from spinning down
+    - cron: '*/10 * * * *'
+  workflow_dispatch: # Allows manual triggering from GitHub UI
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Vercel Deployment
+        run: |
+          echo "Pinging Vercel to keep it awake..."
+          # Menggunakan variabel VERCEL_URL dari GitHub Secrets
+          # Pastikan Anda telah menambahkan VERCEL_URL di Settings > Secrets and variables > Actions
+          if [ -z "${{ secrets.VERCEL_URL }}" ]; then
+            echo "Error: VERCEL_URL secret is not set!"
+            echo "Silakan tambahkan VERCEL_URL (contoh: https://absensi-app.vercel.app) di GitHub Secrets."
+            exit 1
+          fi
+          
+          curl -s -o /dev/null -w "%{http_code}" ${{ secrets.VERCEL_URL }}
+          echo " Ping completed."

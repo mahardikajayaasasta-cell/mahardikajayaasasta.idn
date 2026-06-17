@@ -162,6 +162,8 @@ let map = null;
 let userMarker = null;
 let officeMarkers = [];
 let officeCircles = [];
+let currentLat = null;
+let currentLon = null;
 
 // Tab Switching
 const btnForm = document.getElementById('btn-mode-form');
@@ -213,7 +215,7 @@ function initMap() {
         officeCircles.push(circle);
     });
 
-    if (currentLat && currentLon) {
+    if (currentLat !== null && currentLon !== null) {
         updateUserOnMap();
     }
 }
@@ -282,7 +284,15 @@ function initGPS() {
             checkReady();
         },
         (err) => {
-            gpsStatus.innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-red-500 flex-shrink-0"></div><span class="text-red-600">Gagal: ${err.message}</span>`;
+            let errorMsg = err.message;
+            if (err.code === 1) { // PERMISSION_DENIED
+                errorMsg = "Akses lokasi ditolak. Mohon izinkan akses lokasi pada browser Anda.";
+            } else if (err.code === 2) { // POSITION_UNAVAILABLE
+                errorMsg = "Informasi lokasi tidak tersedia. Pastikan GPS perangkat Anda aktif.";
+            } else if (err.code === 3) { // TIMEOUT
+                errorMsg = "Waktu pencarian lokasi habis. Silakan coba lagi.";
+            }
+            gpsStatus.innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-red-500 flex-shrink-0"></div><span class="text-red-600">Gagal: ${errorMsg}</span>`;
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );

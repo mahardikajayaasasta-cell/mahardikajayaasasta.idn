@@ -11,15 +11,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Ping Vercel Deployment
+        env:
+          VERCEL_URL: ${{ secrets.VERCEL_URL }}
         run: |
           echo "Pinging Vercel to keep it awake..."
-          # Menggunakan variabel VERCEL_URL dari GitHub Secrets
-          # Pastikan Anda telah menambahkan VERCEL_URL di Settings > Secrets and variables > Actions
-          if [ -z "${{ secrets.VERCEL_URL }}" ]; then
+          
+          if [ -z "$VERCEL_URL" ]; then
             echo "Error: VERCEL_URL secret is not set!"
-            echo "Silakan tambahkan VERCEL_URL (contoh: https://absensi-app.vercel.app) di GitHub Secrets."
+            echo "Silakan tambahkan VERCEL_URL di Settings > Secrets and variables > Actions > New repository secret"
             exit 1
           fi
           
-          curl -s -o /dev/null -w "%{http_code}" ${{ secrets.VERCEL_URL }}
-          echo " Ping completed."
+          # Tambahkan "https://" jika user hanya mengetik domain url
+          if [[ ! "$VERCEL_URL" =~ ^https?:// ]]; then
+            VERCEL_URL="https://$VERCEL_URL"
+          fi
+          
+          echo "Menghubungi URL: $VERCEL_URL"
+          
+          # Gunakan cURL, cetak kode HTTP
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$VERCEL_URL")
+          echo "HTTP Code Response: $HTTP_CODE"
+          
+          # Anggap sukses jika mendapat response HTTP 200, 301, 302, atau 308 (Redirect HTTPS Vercel)
+          if [ "$HTTP_CODE" -eq 200 ] || [ "$HTTP_CODE" -eq 301 ] || [ "$HTTP_CODE" -eq 302 ] || [ "$HTTP_CODE" -eq 308 ]; then
+             echo "✅ Ping successful. Vercel is awake!"
+          else
+             echo "⚠️ Ping membalas dengan status $HTTP_CODE. Vercel tetap bangun, tapi pastikan URL Anda aktif."
+          fi

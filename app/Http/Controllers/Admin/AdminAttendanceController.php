@@ -82,7 +82,8 @@ class AdminAttendanceController
      */
     public function exportExcel(Request $request)
     {
-        $dateFrom = $request->get('date_from', today()->format('Y-m-d'));
+        $defaultDateFrom = today()->subDays(14)->format('Y-m-d');
+        $dateFrom = $request->get('date_from', $defaultDateFrom);
         $dateTo   = $request->get('date_to', today()->format('Y-m-d'));
         $userId   = $request->get('user_id', null);
 
@@ -99,7 +100,8 @@ class AdminAttendanceController
      */
     public function exportPdf(Request $request)
     {
-        $dateFrom = $request->get('date_from', today()->format('Y-m-d'));
+        $defaultDateFrom = today()->subDays(14)->format('Y-m-d');
+        $dateFrom = $request->get('date_from', $defaultDateFrom);
         $dateTo   = $request->get('date_to', today()->format('Y-m-d'));
         $userId   = $request->get('user_id', null);
 

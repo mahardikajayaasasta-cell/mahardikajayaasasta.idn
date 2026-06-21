@@ -8,20 +8,9 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 
 // =============================================
-// Remote Database Setup (Khusus Vercel)
+// Note: /setup-db route has been removed for security reasons. 
+// Do not expose Artisan commands via public HTTP GET routes.
 // =============================================
-Route::get('/setup-db', function () {
-    try {
-        \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
-        \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
-        return "Database berhasil di-migrate dan di-seed! <a href='/'>Klik di sini untuk Login</a>";
-    } catch (\Exception $e) {
-        return "Error saat menjalankan setup: " . $e->getMessage();
-    }
-});
-
-
-
 
 
 // =============================================
@@ -50,33 +39,7 @@ Route::get('/', function () {
 // Auth routes (Laravel Breeze)
 require __DIR__.'/auth.php';
 
-Route::get('/debug-user', function() {
-    if (auth()->check()) {
-        $user = auth()->user();
-        return [
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'role' => $user->role,
-            'is_admin' => $user->isAdmin(),
-            'is_karyawan' => $user->isKaryawan(),
-            'session_driver' => config('session.driver'),
-            'session_id' => session()->getId(),
-        ];
-    }
-    return "Not logged in. Session driver: " . config('session.driver');
-});
-
-Route::get('/debug-routes', function() {
-    $routes = \Illuminate\Support\Facades\Route::getRoutes();
-    $data = [];
-    foreach ($routes as $route) {
-        if (str_starts_with($route->getName(), 'admin.')) {
-            $data[$route->getName()] = $route->uri();
-        }
-    }
-    return $data;
-});
+// Debug routes removed for security.
 
 // =============================================
 // Dashboard redirect setelah login

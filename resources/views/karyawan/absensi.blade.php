@@ -262,6 +262,31 @@ function initGPS() {
 
     navigator.geolocation.watchPosition(
         (pos) => {
+            // ==== Mulai: Anti Fake GPS ====
+            const isDesktop = !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+            let fakeError = null;
+
+            // 1. Blokir PC/Desktop (Mencegah Chrome DevTools Location Spoofing)
+            if (isDesktop) {
+                fakeError = "Absensi hanya diizinkan melalui perangkat HP/Mobile. Penggunaan PC/Laptop tidak diizinkan.";
+            } 
+            // 2. Akurasi Tidak Wajar. FakeGPS sering mengunci akurasi ke angka tetap 0 atau 1 meter (HP nyata biasanya 3-4m terbaik)
+            else if (pos.coords.accuracy <= 1) {
+                fakeError = "Akurasi GPS tidak wajar terdeteksi. Matikan aplikasi Fake GPS Anda.";
+            }
+            // 3. Properti Native Mocked (Ada di beberap webview & browser OS)
+            else if (pos.mocked || (pos.coords && pos.coords.mocked)) {
+                fakeError = "Penggunaan Mock Location (Lokasi Palsu) terdeteksi dari perangkat Anda.";
+            }
+
+            if (fakeError) {
+                gpsStatus.innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-red-500 flex-shrink-0"></div><span class="text-red-700 font-bold text-xs">${fakeError}</span>`;
+                gpsReady = false;
+                checkReady();
+                return; // Stop eksekusi!
+            }
+            // ==== Selesai: Anti Fake GPS ====
+
             currentLat = pos.coords.latitude;
             currentLon = pos.coords.longitude;
             const acc = Math.round(pos.coords.accuracy);
@@ -292,11 +317,34 @@ function initGPS() {
             } else if (err.code === 3) { // TIMEOUT
                 errorMsg = "Waktu pencarian lokasi habis. Silakan coba lagi.";
             }
-            gpsStatus.innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-red-500 flex-shrink-0"></div><span class="text-red-600">Gagal: ${errorMsg}</span>`;
+            
+            let fallbackHtml = '';
+            const host = window.location.hostname;
+            if (host === 'localhost' || host === '127.0.0.1' || host.startsWith('192.168.') || host.startsWith('10.')) {
+                fallbackHtml = `<div class="mt-2 ml-4"><button type="button" onclick="useSimulatedLocation()" class="px-3 py-1.5 bg-yellow-100 text-yellow-800 rounded-lg text-xs font-bold border border-yellow-300 hover:bg-yellow-200 transition-colors">Bypass GPS (Mode Testing)</button></div>`;
+            }
+
+            gpsStatus.innerHTML = `<div><div class="flex items-center gap-3"><div class="w-2.5 h-2.5 rounded-full bg-red-500 flex-shrink-0"></div><span class="text-red-600">Gagal: ${errorMsg}</span></div>${fallbackHtml}</div>`;
         },
         { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
     );
 }
+
+window.useSimulatedLocation = function() {
+    const loc = document.getElementById('location-select');
+    if (!loc || !loc.value) {
+        showToast('Pilih lokasi kerja terlebih dahulu pada dropdown di atas.', 'error');
+        return;
+    }
+    const selOpt = loc.options[loc.selectedIndex];
+    currentLat = parseFloat(selOpt.dataset.lat);
+    currentLon = parseFloat(selOpt.dataset.lon);
+    gpsReady = true;
+    
+    document.getElementById('gps-status').innerHTML = `<div class="w-2.5 h-2.5 rounded-full bg-yellow-500 flex-shrink-0"></div><span class="text-yellow-700 font-medium">✅ GPS Simulasi Aktif (Testing Mode) · Menggunakan koordinat kantor.</span>`;
+    updateUserOnMap();
+    checkReady();
+};
 
 // Haversine for JS distance display
 function haversineJS(lat1, lon1, lat2, lon2) {
@@ -330,6 +378,23 @@ document.getElementById('btn-start-camera').addEventListener('click', async () =
         
         const video = document.getElementById('camera-video');
         video.srcObject = stream;
+        
+        // ==== Mulai: Anti Fake Camera (Virtual Camera/OBS) ====
+        // Harus dicek setelah izin diberikan
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(d => d.kind === 'videoinput');
+        const isVirtual = videoDevices.some(d => {
+            const label = (d.label || '').toLowerCase();
+            return label.includes('virtual') || label.includes('obs') || label.includes('manycam') || label.includes('splitcam');
+        });
+
+        if (isVirtual) {
+            // Matikan stream
+            stream.getTracks().forEach(track => track.stop());
+            throw new Error("Terdeteksi Kamera Virtual (OBS/ManyCam/dll). Harap matikan aplikasi virtual camera Anda. Sistem mendeteksi upaya pemalsuan kamera.");
+        }
+        // ==== Selesai: Anti Fake Camera ====
+
         document.getElementById('camera-placeholder').style.display = 'none';
         document.getElementById('btn-capture').disabled = false;
         document.getElementById('btn-start-camera').textContent = '✓ Kamera Aktif';
@@ -355,7 +420,36 @@ document.getElementById('btn-capture').addEventListener('click', () => {
     const ctx = canvas.getContext('2d');
     canvas.width = video.videoWidth || 640;
     canvas.height = video.videoHeight || 480;
-    ctx.drawImage(video, 0, 0);
+    
+    // 1. Gambar frame asli
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // ==== Mulai: Pengamanan Watermark Validasi ====
+    // Watermark transparan di tengah (diagonal) agar tidak bisa memakai ulang layar HP/Foto cetak
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(-Math.PI / 6);
+    ctx.font = "bold 36px Arial";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+    ctx.textAlign = "center";
+    ctx.fillText("LIVE ABSENSI MJA", 0, 0);
+    ctx.restore();
+
+    // 2. Tulis data Anti-Manipulasi di foto (Waktu dan Koordinat real-time)
+    ctx.fillStyle = "rgba(0, 0, 0, 0.6)"; // Background gelap di bawah
+    ctx.fillRect(0, canvas.height - 65, canvas.width, 65);
+    
+    ctx.font = "bold 14px Arial";
+    ctx.fillStyle = "#ffffff";
+    ctx.shadowColor = "black";
+    ctx.shadowBlur = 4;
+    
+    const waktuTangkapan = new Date().toLocaleString('id-ID');
+    const posisiTangkapan = (currentLat && currentLon) ? `Lat: ${currentLat.toFixed(5)}, Lon: ${currentLon.toFixed(5)}` : 'GPS Belum Dikunci';
+    
+    ctx.fillText(`Waktu  : ${waktuTangkapan}`, 15, canvas.height - 35);
+    ctx.fillText(`Lokasi : ${posisiTangkapan}`, 15, canvas.height - 15);
+    // ==== Selesai: Pengamanan Watermark Validasi ====
 
     capturedPhoto = canvas.toDataURL('image/jpeg', 0.85);
     canvas.classList.remove('hidden');

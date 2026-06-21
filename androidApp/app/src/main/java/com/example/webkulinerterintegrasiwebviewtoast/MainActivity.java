@@ -46,6 +46,10 @@ public class MainActivity extends AppCompatActivity {
         webSettings.setDatabaseEnabled(true); // Aktifkan Database lokal agar cart tersimpan aman
         webSettings.setAllowFileAccess(true); // Izinkan pembacaan aset lokal
 
+        // PENTING: Aktifkan Viewport agar Tailwind / Mobile Layout berfungsi!
+        webSettings.setUseWideViewPort(true);
+        webSettings.setLoadWithOverviewMode(true);
+
         // 3. Konfigurasi SwipeRefreshLayout (Pull-to-Refresh)
         swipeRefreshLayout.setColorSchemeColors(getResources().getColor(android.R.color.holo_orange_dark));
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

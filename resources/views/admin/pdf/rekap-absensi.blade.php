@@ -8,8 +8,9 @@
         body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; font-size: 11px; color: #333; padding: 30px; }
 
         /* KOP SURAT */
-        .kop-surat { width: 100%; border-bottom: 3px solid #1e3a8a; padding-bottom: 12px; margin-bottom: 25px; text-align: center; }
-        .kop-surat h1 { font-size: 22px; font-weight: 800; color: #1e3a8a; text-transform: uppercase; margin-bottom: 5px; letter-spacing: 1px; }
+        .kop-surat { width: 100%; border-bottom: 3px solid #1e3a8a; padding-bottom: 10px; margin-bottom: 25px; }
+        .kop-surat table { width: 100%; border-collapse: collapse; }
+        .kop-surat h1 { font-size: 22px; font-weight: 800; color: #1e3a8a; text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1px; }
         .kop-surat p { font-size: 11px; color: #475569; line-height: 1.4; }
 
         /* LAPORAN TITLE */
@@ -49,11 +50,30 @@
     </style>
 </head>
 <body>
+    @php
+        $logoPath = public_path('logo-mja.jpg');
+        $logoBase64 = '';
+        if (file_exists($logoPath)) {
+            $logoData = base64_encode(file_get_contents($logoPath));
+            $logoBase64 = 'data:image/jpeg;base64,' . $logoData;
+        }
+    @endphp
 
     <div class="kop-surat">
-        <h1>PT MAHARDIKA JAYA ASASTA</h1>
-        <p>Gedung Mahardika Lt.3, Jl. Surya Kencana No. 1, Pamulang, Tangerang Selatan, Banten<br>
-        Telp: (021) 12345678 | Email: hrd@mahardikajayaasasta.com | Web: www.mahardikajayaasasta.com</p>
+        <table>
+            <tr>
+                <td style="width: 15%; text-align: left; vertical-align: middle;">
+                    @if($logoBase64)
+                        <img src="{{ $logoBase64 }}" style="max-height: 70px; width: auto;">
+                    @endif
+                </td>
+                <td style="width: 85%; text-align: center; vertical-align: middle; padding-right: 15%;">
+                    <h1>PT MAHARDIKA JAYA ASASTA</h1>
+                    <p>Gedung Mahardika Lt.3, Jl. Surya Kencana No. 1, Pamulang, Tangerang Selatan, Banten<br>
+                    Telp: (021) 12345678 | Email: hrd@mahardikajayaasasta.com | Web: www.mahardikajayaasasta.com</p>
+                </td>
+            </tr>
+        </table>
     </div>
 
     <div class="report-title">

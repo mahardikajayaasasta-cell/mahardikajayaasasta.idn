@@ -68,9 +68,9 @@
         }
     </style>
 </head>
-<body class="bg-white min-h-screen flex overflow-hidden">
+<body class="bg-white min-h-screen flex flex-col lg:flex-row">
     <!-- Left Section: Form -->
-    <div class="w-full lg:w-1/2 flex items-center justify-center p-8 md:p-16 lg:p-24 bg-white relative z-10">
+    <div class="w-full lg:w-1/2 flex-1 flex flex-col justify-center p-6 sm:p-12 lg:p-24 bg-white relative z-10 min-h-screen lg:min-h-0">
         <div class="w-full max-w-md">
             <div class="flex items-center gap-3 mb-8">
                 <div class="w-16 h-16 bg-white rounded-2xl flex items-center justify-center overflow-hidden border border-slate-100 shadow-md p-1">

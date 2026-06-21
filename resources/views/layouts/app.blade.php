@@ -131,7 +131,7 @@
     </aside>
 
     <!-- Main Content -->
-    <div class="flex-1 lg:ml-20 flex flex-col min-h-screen transition-all duration-300">
+    <div class="flex-1 lg:ml-20 flex flex-col min-w-0 min-h-screen transition-all duration-300">
         <!-- Top bar (mobile) -->
         <header class="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between lg:hidden sticky top-0 z-40 shadow-sm">
             <button id="mobile-menu-btn" class="p-2 rounded-lg text-slate-600 hover:bg-slate-100 transition-colors">

@@ -93,5 +93,81 @@ class DatabaseSeeder extends Seeder
                 ]
             );
         } catch (\Exception $e) {}
+        try {
+            $dummyNames = ['Agus Setiawan', 'Dewi Lestari', 'Reza Pramana'];
+            foreach ($dummyNames as $index => $name) {
+                User::updateOrCreate(
+                    ['email' => 'karyawan' . ($index + 3) . '@absensi.app'],
+                    [
+                        'name'        => $name,
+                        'password'    => Hash::make('password'),
+                        'role'        => 'karyawan',
+                        'employee_id' => 'KRY00' . ($index + 3),
+                        'department'  => 'Operasional',
+                        'position'    => 'Staff',
+                        'is_active'   => true,
+                    ]
+                );
+            }
+        } catch (\Exception $e) {}
+
+        // Inject Dummy Attendance Data (Past 14 Hari)
+        try {
+            $locations = Location::all();
+            $users = User::karyawan()->get();
+            $today = \Illuminate\Support\Carbon::today();
+
+            if ($locations->isNotEmpty() && $users->isNotEmpty()) {
+                foreach ($users as $u) {
+                    for ($i = 1; $i <= 14; $i++) {
+                        $date = $today->copy()->subDays($i);
+                        // Skip hari minggu (Biarkan kosong agar realistis)
+                        if ($date->isSunday()) continue;
+
+                        $hasAtt = \App\Models\Attendance::where('user_id', $u->id)->whereDate('date', $date)->exists();
+                        if (!$hasAtt) {
+                            $isLate = rand(0, 100) > 80; // 20% probabilitas telat
+                            $isMangkir = rand(0, 100) > 95; // 5% probabilitas mangkir
+                            
+                            $loc = $locations->random();
+                            
+                            if ($isMangkir) {
+                                \App\Models\Attendance::create([
+                                    'user_id' => $u->id,
+                                    'date' => $date,
+                                    'status' => 'Mangkir',
+                                    'notes' => 'Tidak hadir tanpa keterangan (Data Dummy)',
+                                ]);
+                            } else {
+                                $clockInTime = $isLate 
+                                    ? $date->copy()->setTime(rand(8, 9), rand(31, 59), 0) // Telat
+                                    : $date->copy()->setTime(rand(7, 8), rand(0, 29), 0); // On time
+                                    
+                                $clockOutTime = $clockInTime->copy()->addHours(rand(8, 10))->addMinutes(rand(0, 59));
+
+                                \App\Models\Attendance::create([
+                                    'user_id' => $u->id,
+                                    'location_id' => $loc->id,
+                                    'date' => $date, // Tanggal Absensi
+                                    'clock_in' => $clockInTime,
+                                    'clock_in_latitude' => $loc->latitude + (rand(-100, 100) / 1000000),
+                                    'clock_in_longitude' => $loc->longitude + (rand(-100, 100) / 1000000),
+                                    'clock_in_distance' => rand(5, $loc->radius - 5),
+                                    'clock_in_photo' => 'https://ui-avatars.com/api/?name='.urlencode($u->name).'&background=random&color=fff&size=600',
+                                    'clock_out' => $clockOutTime,
+                                    'clock_out_latitude' => $loc->latitude + (rand(-100, 100) / 1000000),
+                                    'clock_out_longitude' => $loc->longitude + (rand(-100, 100) / 1000000),
+                                    'clock_out_distance' => rand(5, $loc->radius - 5),
+                                    'clock_out_photo' => 'https://ui-avatars.com/api/?name='.urlencode($u->name).'&background=random&color=fff&size=600',
+                                    'status' => $isLate ? 'Telat' : 'Hadir',
+                                ]);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            \Log::error('Dummy Seeder Error: ' . $e->getMessage());
+        }
     }
 }

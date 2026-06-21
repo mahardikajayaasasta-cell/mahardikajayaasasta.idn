@@ -115,4 +115,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Manajemen Lokasi
     Route::resource('/lokasi', AdminLocationController::class)->except(['show']);
+
+    // SEMENTARA: Rute inject data dummy (hapus setelah selesai testing)
+    Route::get('/seed-dummy', function () {
+        try {
+            \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+            return response()->json(['success' => true, 'message' => 'Data dummy berhasil disuntikkan!', 'output' => \Illuminate\Support\Facades\Artisan::output()]);
+        } catch (\Exception $e) {
+            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+        }
+    })->name('seed-dummy');
 });

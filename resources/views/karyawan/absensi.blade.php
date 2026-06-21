@@ -263,15 +263,10 @@ function initGPS() {
     navigator.geolocation.watchPosition(
         (pos) => {
             // ==== Mulai: Anti Fake GPS ====
-            const isDesktop = !/iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
             let fakeError = null;
 
-            // 1. Blokir PC/Desktop (Mencegah Chrome DevTools Location Spoofing)
-            if (isDesktop) {
-                fakeError = "Absensi hanya diizinkan melalui perangkat HP/Mobile. Penggunaan PC/Laptop tidak diizinkan.";
-            } 
-            // 2. Akurasi Tidak Wajar. FakeGPS sering mengunci akurasi ke angka tetap 0 atau 1 meter (HP nyata biasanya 3-4m terbaik)
-            else if (pos.coords.accuracy <= 1) {
+            // 1. Akurasi Tidak Wajar. FakeGPS sering mengunci akurasi ke angka tetap 0 atau 1 meter (HP nyata biasanya 3-4m terbaik)
+            if (pos.coords.accuracy <= 1) {
                 fakeError = "Akurasi GPS tidak wajar terdeteksi. Matikan aplikasi Fake GPS Anda.";
             }
             // 3. Properti Native Mocked (Ada di beberap webview & browser OS)

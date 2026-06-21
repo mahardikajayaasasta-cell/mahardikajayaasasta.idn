@@ -51,7 +51,9 @@ class AdminAttendanceController
      */
     public function rekap(Request $request)
     {
-        $dateFrom = $request->get('date_from', today()->format('Y-m-d'));
+        // Default menampilkan data dari awal bulan (atau minimum 14 hari terakhir) hingga hari ini
+        $defaultDateFrom = today()->subDays(14)->format('Y-m-d');
+        $dateFrom = $request->get('date_from', $defaultDateFrom);
         $dateTo   = $request->get('date_to', today()->format('Y-m-d'));
         $status   = $request->get('status', '');
         $userId   = $request->get('user_id', '');

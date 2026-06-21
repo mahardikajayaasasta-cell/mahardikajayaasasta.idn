@@ -13,8 +13,8 @@
 <div class="max-w-2xl mx-auto">
     <!-- Header -->
     <div class="mb-6">
-        <h2 class="text-2xl font-bold text-slate-800">Absensi Hari Ini</h2>
-        <p class="text-slate-500 text-sm mt-1">{{ now()->translatedFormat('l, d F Y') }} • Waktu Server: <span id="server-time" class="font-mono font-semibold text-blue-600">{{ now()->setTimezone(config('app.timezone'))->format('H:i:s') }}</span></p>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Absensi Hari Ini</h2>
+        <p class="text-slate-500 text-xs sm:text-sm mt-1">{{ now()->translatedFormat('l, d F Y') }} • Waktu Server: <span id="server-time" class="font-mono font-semibold text-blue-600">{{ now()->setTimezone(config('app.timezone'))->format('H:i:s') }}</span></p>
     </div>
 
     <!-- Mode Tabs -->

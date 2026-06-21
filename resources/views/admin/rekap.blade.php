@@ -3,10 +3,10 @@
 
 @section('content')
 <div class="max-w-7xl mx-auto">
-    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div class="mb-6 flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-            <h2 class="text-2xl font-bold text-slate-800">Rekap Absensi</h2>
-            <p class="text-slate-500 text-sm mt-1">Filter dan lihat data absensi karyawan</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Rekap Absensi</h2>
+            <p class="text-slate-500 text-xs sm:text-sm mt-1">Filter dan lihat data absensi karyawan</p>
         </div>
         <div class="flex items-center gap-2">
             <a href="{{ route('admin.export.excel', request()->query()) }}"
@@ -24,7 +24,7 @@
 
     <!-- Filter Form -->
     <form method="GET" action="{{ route('admin.rekap') }}" class="bg-white rounded-2xl border border-slate-200 p-5 mb-6 shadow-sm">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <div>
                 <label class="block text-xs font-semibold text-slate-500 mb-1.5">Dari Tanggal</label>
                 <input type="date" name="date_from" value="{{ $dateFrom }}"

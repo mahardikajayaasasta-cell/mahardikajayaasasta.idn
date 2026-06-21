@@ -17,17 +17,17 @@
 @section('content')
 <div class="max-w-4xl mx-auto">
     <!-- Greeting -->
-    <div class="flex items-center justify-between gap-4 mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
-            <h2 class="text-2xl font-bold text-slate-800">Halo, {{ auth()->user()->name }}! 👋</h2>
-            <p class="text-slate-500 text-sm mt-1">{{ now()->translatedFormat('l, d F Y') }}</p>
+            <h2 class="text-lg sm:text-2xl font-bold text-slate-800">Halo, {{ auth()->user()->name }}! 👋</h2>
+            <p class="text-slate-500 text-xs sm:text-sm mt-1">{{ now()->translatedFormat('l, d F Y') }}</p>
         </div>
         <!-- Mode Switcher -->
-        <div class="flex bg-slate-100 p-1 rounded-xl nav-tabs">
-            <button id="btn-mode-stats" class="px-4 py-2 text-xs font-bold rounded-lg transition-all active bg-white shadow-sm text-blue-600">
+        <div class="flex bg-slate-100 p-1 rounded-xl nav-tabs self-start sm:self-auto">
+            <button id="btn-mode-stats" class="px-3 sm:px-4 py-2 text-xs font-bold rounded-lg transition-all active bg-white shadow-sm text-blue-600">
                 📊 Ringkasan
             </button>
-            <button id="btn-mode-map" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-700">
+            <button id="btn-mode-map" class="px-3 sm:px-4 py-2 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-700">
                 📍 Lokasi Kantor
             </button>
         </div>
@@ -49,8 +49,8 @@
         <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 80% 20%, white 1px, transparent 1px); background-size: 20px 20px;"></div>
         <div class="relative">
             <p class="text-white/80 text-sm font-medium">Status Absensi Hari Ini</p>
-            <h3 class="text-3xl font-bold mt-1">{{ $attendance?->status ?? 'Belum Absen' }}</h3>
-            <div class="flex flex-wrap gap-4 mt-4 text-sm">
+    <h3 class="text-xl sm:text-3xl font-bold mt-1">{{ $attendance?->status ?? 'Belum Absen' }}</h3>
+            <div class="flex flex-wrap gap-3 sm:gap-4 mt-3 sm:mt-4 text-xs sm:text-sm">
                 <div>
                     <p class="text-white/70">Masuk</p>
                     <p class="font-bold">{{ $attendance?->clock_in?->format('H:i') ?? '—' }}</p>

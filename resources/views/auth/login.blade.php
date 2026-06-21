@@ -13,9 +13,15 @@
         }
         .login-title {
             color: #2d3748;
-            font-size: 3.5rem;
+            font-size: 2rem;
             font-weight: 700;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
+        }
+        @media (min-width: 640px) {
+            .login-title {
+                font-size: 3.5rem;
+                margin-bottom: 2rem;
+            }
         }
         .input-group {
             position: relative;

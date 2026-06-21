@@ -11,17 +11,17 @@
 
 @section('content')
 <div class="max-w-6xl mx-auto">
-    <div class="flex items-center justify-between gap-4 mb-6">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-6">
         <div>
-            <h2 class="text-2xl font-bold text-slate-800">Dashboard Admin</h2>
-            <p class="text-slate-500 text-sm mt-1">{{ now()->translatedFormat('l, d F Y') }}</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Dashboard Admin</h2>
+            <p class="text-slate-500 text-xs sm:text-sm mt-1">{{ now()->translatedFormat('l, d F Y') }}</p>
         </div>
         <!-- Mode Switcher -->
-        <div class="flex bg-slate-100 p-1 rounded-xl nav-tabs">
-            <button id="btn-mode-stats" class="px-4 py-2 text-xs font-bold rounded-lg transition-all active bg-white shadow-sm text-blue-600">
+        <div class="flex bg-slate-100 p-1 rounded-xl nav-tabs self-start sm:self-auto">
+            <button id="btn-mode-stats" class="px-3 sm:px-4 py-2 text-xs font-bold rounded-lg transition-all active bg-white shadow-sm text-blue-600">
                 📊 Ringkasan
             </button>
-            <button id="btn-mode-map" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-700">
+            <button id="btn-mode-map" class="px-3 sm:px-4 py-2 text-xs font-bold rounded-lg transition-all text-slate-500 hover:text-slate-700">
                 📍 Peta Live
             </button>
         </div>
@@ -30,7 +30,7 @@
     <!-- Content Wrapper for Stats Mode -->
     <div id="stats-view">
         <!-- Stats Grid -->
-        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
         @php
             $statCards = [
                 ['label' => 'Total Karyawan', 'value' => $stats['total_karyawan'], 'color' => 'from-slate-600 to-slate-700', 'icon' => 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857'],
@@ -41,18 +41,18 @@
             ];
         @endphp
         @foreach($statCards as $card)
-        <div class="bg-gradient-to-br {{ $card['color'] }} rounded-2xl p-5 text-white shadow-lg">
-            <svg class="w-5 h-5 opacity-80 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="bg-gradient-to-br {{ $card['color'] }} rounded-xl sm:rounded-2xl p-3 sm:p-5 text-white shadow-lg">
+            <svg class="w-4 sm:w-5 h-4 sm:h-5 opacity-80 mb-2 sm:mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="{{ $card['icon'] }}"/>
             </svg>
-            <p class="text-3xl font-bold">{{ $card['value'] }}</p>
-            <p class="text-white/80 text-xs mt-1">{{ $card['label'] }}</p>
+            <p class="text-2xl sm:text-3xl font-bold">{{ $card['value'] }}</p>
+            <p class="text-white/80 text-[10px] sm:text-xs mt-1">{{ $card['label'] }}</p>
         </div>
         @endforeach
     </div>
 
     <!-- Quick Actions -->
-    <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-3 mb-6 sm:mb-8">
         <a href="{{ route('admin.rekap') }}" class="flex items-center gap-3 bg-white border border-slate-200 rounded-xl px-4 py-3 hover:shadow-md transition-all group">
             <div class="w-9 h-9 bg-blue-50 rounded-lg flex items-center justify-center group-hover:bg-blue-100 transition-colors">
                 <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
@@ -93,7 +93,9 @@
             <h3 class="font-bold text-slate-700">Absensi Hari Ini</h3>
             <a href="{{ route('admin.rekap') }}" class="text-xs text-blue-600 hover:text-blue-700 font-medium">Lihat semua →</a>
         </div>
-        <div class="overflow-x-auto">
+        <div class="overflow-x-auto -mx-0">
+            <!-- Mobile: card layout, Desktop: table -->
+            <style>.mobile-att-table { min-width: 500px; }</style>
             <table class="w-full text-sm">
                 <thead class="bg-slate-50 text-slate-500 uppercase text-xs">
                     <tr>

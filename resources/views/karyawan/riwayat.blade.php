@@ -3,12 +3,12 @@
 
 @section('content')
 <div class="max-w-4xl mx-auto">
-    <div class="mb-6 flex flex-wrap items-center justify-between gap-4">
+    <div class="mb-6 flex flex-col sm:flex-row sm:flex-wrap sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-            <h2 class="text-2xl font-bold text-slate-800">Riwayat Absensi</h2>
-            <p class="text-slate-500 text-sm mt-1">{{ auth()->user()->name }}</p>
+            <h2 class="text-xl sm:text-2xl font-bold text-slate-800">Riwayat Absensi</h2>
+            <p class="text-slate-500 text-xs sm:text-sm mt-1">{{ auth()->user()->name }}</p>
         </div>
-        <form method="GET" class="flex items-center gap-2">
+        <form method="GET" class="flex flex-wrap items-center gap-2">
             <select name="month" class="form-input w-auto text-xs py-2">
                 @for($m = 1; $m <= 12; $m++)
                     <option value="{{ $m }}" {{ $month == $m ? 'selected' : '' }}>
@@ -28,15 +28,15 @@
     <!-- Stats bulan ini -->
     <div class="grid grid-cols-3 gap-4 mb-6">
         <div class="bg-emerald-50 border border-emerald-100 rounded-2xl p-4 text-center">
-            <p class="text-3xl font-bold text-emerald-700">{{ $stats['hadir'] }}</p>
+            <p class="text-xl sm:text-3xl font-bold text-emerald-700">{{ $stats['hadir'] }}</p>
             <p class="text-xs text-emerald-600 mt-1">Hadir</p>
         </div>
         <div class="bg-amber-50 border border-amber-100 rounded-2xl p-4 text-center">
-            <p class="text-3xl font-bold text-amber-700">{{ $stats['telat'] }}</p>
+            <p class="text-xl sm:text-3xl font-bold text-amber-700">{{ $stats['telat'] }}</p>
             <p class="text-xs text-amber-600 mt-1">Telat</p>
         </div>
         <div class="bg-red-50 border border-red-100 rounded-2xl p-4 text-center">
-            <p class="text-3xl font-bold text-red-700">{{ $stats['mangkir'] }}</p>
+            <p class="text-xl sm:text-3xl font-bold text-red-700">{{ $stats['mangkir'] }}</p>
             <p class="text-xs text-red-600 mt-1">Mangkir</p>
         </div>
     </div>

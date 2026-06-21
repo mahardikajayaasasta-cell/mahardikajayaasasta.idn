@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Kuliner Terinvestasi</title>
+    <!-- Google Fonts untuk keindahan tipografi -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,600;0,800;1,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #FF6B35;
+            --primary-gradient: linear-gradient(135deg, #FF6B35 0%, #D4501D 100%);
+            --primary-glow: rgba(255, 107, 53, 0.25);
+            --accent: #FFB800;
+            --accent-gradient: linear-gradient(135deg, #FFB800 0%, #E0A000 100%);
+            --bg-dark: #0A0C10;
+            --card-bg: #15181F;
+            --text-main: #F4F5F6;
+            --text-muted: #8E96A3;
+            --border-glow: rgba(255, 255, 255, 0.05);
+            --modal-bg: rgba(21, 24, 31, 0.96);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 100px; /* Ruang untuk floating cart */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Header Aksen */
+        header {
+            text-align: center;
+            margin-bottom: 25px;
+            width: 100%;
+            max-width: 600px;
+            animation: fadeInDown 0.8s ease-out;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .logo-icon {
+            font-size: 2.5rem;
+            animation: bounceLogo 3s infinite ease-in-out;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FFFFFF, var(--primary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 300;
+            letter-spacing: 0.5px;
+        }
+
+        /* Search & Filter Controls */
+        .controls-container {
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        .search-bar-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-input {
+            width: 100%;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-glow);
+            border-radius: 15px;
+            padding: 14px 16px 14px 45px;
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 15px var(--primary-glow);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: var(--text-muted);
+            stroke-width: 2;
+        }
+
+        /* Filter Tabs */
+        .filter-tabs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 4px;
+            scrollbar-width: none;
+        }
+
+        .filter-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-btn {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-glow);
+            border-radius: 12px;
+            padding: 8px 16px;
+            color: var(--text-muted);
+            font-size: 0.82rem;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--primary-gradient);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 12px var(--primary-glow);
+        }
+
+        /* Menu Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            width: 100%;
+            max-width: 600px;
+            animation: fadeInUp 0.8s ease-out;
+        }
+
+        @media (min-width: 480px) {
+            .menu-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        /* Card Design */
+        .menu-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            border: 1px solid var(--border-glow);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .menu-card.hidden {
+            display: none;
+        }
+
+        .menu-card:hover {
+            transform: translateY(-6px);
+            border-color: var(--primary);
+            box-shadow: 0 12px 25px var(--primary-glow);
+        }
+
+        /* SVGs Food Graphics Container */
+        .food-image-container {
+            width: 100%;
+            height: 140px;
+            background: linear-gradient(135deg, #1C1E26 0%, #0F1115 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .food-image-container::before {
+            content: '';
+            position: absolute;
+            width: 85px;
+            height: 85px;
+            background: var(--primary-glow);
+            border-radius: 50%;
+            filter: blur(18px);
+            opacity: 0.6;
+        }
+
+        .food-svg {
+            width: 85px;
+            height: 85px;
+            z-index: 1;
+            transition: transform 0.4s ease;
+        }
+
+        .menu-card:hover .food-svg {
+            transform: scale(1.15) rotate(4deg);
+        }
+
+        /* Badge Card */
+        .badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: rgba(255, 107, 53, 0.95);
+            color: white;
+            font-size: 0.68rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(5px);
+            z-index: 2;
+        }
+
+        /* Card Body */
+        .card-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .food-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: #FFFFFF;
+        }
+
+        .food-desc {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+            margin-bottom: 12px;
+            flex-grow: 1;
+        }
+
+        .price-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: auto;
+        }
+
+        .price {
+            font-weight: 700;
+            font-size: 1.05rem;
+            color: var(--accent);
+        }
+
+        /* Add to Cart Button */
+        .btn-order {
+            background: var(--primary-gradient);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            width: 38px;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-order:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(255, 107, 53, 0.5);
+        }
+
+        .btn-order:active {
+            transform: scale(0.95);
+        }
+
+        .btn-order svg {
+            width: 18px;
+            height: 18px;
+            fill: none;
+            stroke: white;
+            stroke-width: 2.5;
+        }
+
+        /* Empty State */
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            display: none;
+        }
+
+        .empty-state-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+
+        /* Sticky Shopping Cart Bar */
+        .cart-bar {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(120px);
+            width: calc(100% - 40px);
+            max-width: 560px;
+            background: rgba(21, 24, 31, 0.92);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 12px 18px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            z-index: 99;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .cart-bar.active {
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .cart-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .cart-icon-container {
+            position: relative;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: var(--primary);
+            color: white;
+            font-size: 0.65rem;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        .cart-text h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .cart-text p {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+        }
+
+        .btn-view-cart {
+            background: var(--accent-gradient);
+            color: #0F1115;
+            border: none;
+            border-radius: 12px;
+            padding: 10px 18px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(255, 184, 0, 0.2);
+        }
+
+        .btn-view-cart:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 15px rgba(255, 184, 0, 0.4);
+        }
+
+        /* Premium Modal Receipt */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .receipt-modal {
+            background: var(--modal-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 420px;
+            padding: 24px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+            transform: scale(0.9);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            color: #FFFFFF;
+        }
+
+        .modal-overlay.active .receipt-modal {
+            transform: scale(1);
+        }
+
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+            padding-bottom: 16px;
+        }
+
+        .receipt-header h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--primary);
+        }
+
+        .receipt-header p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .receipt-items {
+            max-height: 180px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+            padding-right: 4px;
+            scrollbar-width: thin;
+        }
+
+        .receipt-item-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            margin-bottom: 10px;
+        }
+
+        .receipt-item-name {
+            color: #E2E8F0;
+        }
+
+        .receipt-item-price {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .receipt-summary-block {
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 12px;
+            margin-bottom: 20px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .grand-total-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-top: 10px;
+            border-top: 1px dashed rgba(255, 255, 255, 0.1);
+            padding-top: 10px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-modal {
+            width: 100%;
+            border-radius: 14px;
+            padding: 12px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: none;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-modal-wa {
+            background: #25D366;
+            color: white;
+            box-shadow: 0 4px 10px rgba(37, 211, 102, 0.3);
+        }
+
+        .btn-modal-wa:hover {
+            background: #20BA56;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(37, 211, 102, 0.45);
+        }
+
+        .btn-modal-kasir {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 10px rgba(255, 107, 53, 0.3);
+        }
+
+        .btn-modal-kasir:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(255, 107, 53, 0.45);
+        }
+
+        .btn-modal-batal {
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-modal-batal:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounceLogo {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        @keyframes popBadge {
+            0% { transform: scale(0.5); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo-container">
+            <span class="logo-icon">🍲</span>
+            <h1>Web Kuliner</h1>
+        </div>
+        <p class="subtitle">Cita Rasa Nusantara Terinvestasi & Terpercaya</p>
+    </header>
+
+    <!-- Search & Filters -->
+    <div class="controls-container">
+        <div class="search-bar-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="searchInput" class="search-input" placeholder="Cari makanan, minuman, atau cemilan lezat..." onkeyup="filterMenu()">
+        </div>
+        <div class="filter-tabs">
+            <button class="filter-btn active" onclick="setCategory('semua', this)">✨ Semua</button>
+            <button class="filter-btn" onclick="setCategory('makanan', this)">🍛 Makanan</button>
+            <button class="filter-btn" onclick="setCategory('minuman', this)">🍹 Minuman</button>
+            <button class="filter-btn" onclick="setCategory('cemilan', this)">🍌 Cemilan</button>
+        </div>
+    </div>
+
+    <!-- Menu Grid -->
+    <main class="menu-grid" id="menuGrid">
+        <!-- 1. Rendang Daging -->
+        <div class="menu-card" data-category="makanan">
+            <span class="badge">Favorit</span>
+            <div class="food-image-container">
+                <svg class="food-svg" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" fill="#2E1C0C" />
+                    <circle cx="50" cy="50" r="35" fill="#EBEBEB" />
+                    <circle cx="50" cy="50" r="30" fill="#D6D6D6" />
+                    <rect x="35" y="35" width="22" height="22" rx="4" fill="#3D1D03" transform="rotate(15 46 46)" />
+                    <rect x="45" y="42" width="20" height="20" rx="4" fill="#2A1301" transform="rotate(-10 55 52)" />
+                    <path d="M38,40 C42,42 45,35 48,42 C52,49 55,42 58,45 C60,48 50,55 45,50 Z" fill="#692200" opacity="0.9" />
+                    <path d="M42,32 Q45,30 48,34" fill="none" stroke="#2E7D32" stroke-width="3" stroke-linecap="round" />
+                    <path d="M52,55 Q56,58 58,54" fill="none" stroke="#2E7D32" stroke-width="3" stroke-linecap="round" />
+                </svg>
+            </div>
+            <div class="card-body">
+                <h3 class="food-title">Rendang Daging</h3>
+                <p class="food-desc">Daging sapi empuk dipadu dengan resep kelapa & rempah asli Minang otentik selama berjam-jam.</p>
+                <div class="price-row">
+                    <span class="price">Rp 28.000</span>
+                    <button class="btn-order" onclick="tambahKeKeranjang('Rendang Daging', 28000)">
+                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. Sate Ayam Madura -->
+        <div class="menu-card" data-category="makanan">
+            <span class="badge" style="background: #2E7D32;">Terlaris</span>
+            <div class="food-image-container">
+                <svg class="food-svg" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" fill="#3E2723" />
+                    <circle cx="50" cy="50" r="35" fill="#EEEEEE" />
+                    <line x1="20" y1="80" x2="80" y2="20" stroke="#D7CCC8" stroke-width="2.5" stroke-linecap="round" />
+                    <line x1="25" y1="85" x2="85" y2="25" stroke="#D7CCC8" stroke-width="2.5" stroke-linecap="round" />
+                    <circle cx="45" cy="55" r="5" fill="#4E342E" />
+                    <circle cx="53" cy="47" r="5" fill="#3E2723" />
+                    <circle cx="61" cy="39" r="5" fill="#5D4037" />
+                    <circle cx="50" cy="60" r="5" fill="#3E2723" />
+                    <circle cx="58" cy="52" r="5" fill="#4E342E" />
+                    <circle cx="66" cy="44" r="5" fill="#2D1A16" />
+                    <path d="M40,55 C45,58 50,55 58,48 C65,42 62,38 52,44 C42,50 35,52 40,55 Z" fill="#5D4037" opacity="0.85" />
+                </svg>
+            </div>
+            <div class="card-body">
+                <h3 class="food-title">Sate Ayam Madura</h3>
+                <p class="food-desc">Sate daging ayam gurih dipanggang arang kelapa, disajikan dengan lumuran saus kacang legendaris.</p>
+                <div class="price-row">
+                    <span class="price">Rp 22.000</span>
+                    <button class="btn-order" onclick="tambahKeKeranjang('Sate Ayam Madura', 22000)">
+                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. Nasi Goreng Spesial -->
+        <div class="menu-card" data-category="makanan">
+            <div class="food-image-container">
+                <svg class="food-svg" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" fill="#424242" />
+                    <circle cx="50" cy="50" r="35" fill="#F5F5F5" />
+                    <circle cx="50" cy="50" r="26" fill="#D84315" />
+                    <circle cx="42" cy="45" r="2" fill="#FFB300" />
+                    <circle cx="55" cy="40" r="2" fill="#4CAF50" />
+                    <circle cx="48" cy="58" r="2" fill="#FFB300" />
+                    <circle cx="58" cy="52" r="2" fill="#4CAF50" />
+                    <circle cx="48" cy="48" r="12" fill="#FFFFFF" />
+                    <circle cx="51" cy="46" r="6" fill="#FFC107" />
+                    <circle cx="34" cy="56" r="6" fill="#E53935" />
+                </svg>
+            </div>
+            <div class="card-body">
+                <h3 class="food-title">Nasi Goreng Spesial</h3>
+                <p class="food-desc">Nasi goreng wangi bumbu khas rempah, dilengkapi suwiran ayam, sosis, bakso, dan telur mata sapi.</p>
+                <div class="price-row">
+                    <span class="price">Rp 20.000</span>
+                    <button class="btn-order" onclick="tambahKeKeranjang('Nasi Goreng Spesial', 20000)">
+                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Bakso Lava Super -->
+        <div class="menu-card" data-category="makanan">
+            <span class="badge" style="background: #E53935;">Pedas</span>
+            <div class="food-image-container">
+                <svg class="food-svg" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" fill="#5D4037" />
+                    <circle cx="50" cy="50" r="35" fill="#1565C0" />
+                    <circle cx="50" cy="50" r="28" fill="#FFF8E1" />
+                    <path d="M38,40 Q40,55 35,62 M42,35 Q48,58 45,65" fill="none" stroke="#FFD54F" stroke-width="2" stroke-linecap="round" />
+                    <circle cx="58" cy="46" r="15" fill="#795548" />
+                    <path d="M52,40 C56,40 56,48 54,52 C52,56 46,50 48,46 Z" fill="#D84315" />
+                </svg>
+            </div>
+            <div class="card-body">
+                <h3 class="food-title">Bakso Lava Super</h3>
+                <p class="food-desc">Bakso jumbo padat dengan isian sambal cabai rawit melimpah yang pedas membakar lidah Anda.</p>
+                <div class="price-row">
+                    <span class="price">Rp 25.000</span>
+                    <button class="btn-order" onclick="tambahKeKeranjang('Bakso Lava Super', 25000)">
+                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 5. Es Cendol Durian -->
+        <div class="menu-card" data-category="minuman">
+            <span class="badge" style="background: #FFB800; color: #000;">Populer</span>
+            <div class="food-image-container">
+                <svg class="food-svg" viewBox="0 0 100 100">
+                    <path d="M35,20 L65,20 L58,80 L42,80 Z" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" />
+                    <path d="M42,80 L58,80 L56,65 L44,65 Z" fill="#4E342E" />
+                    <path d="M44,65 L56,65 L54,40 L46,40 Z" fill="#EEEEEE" opacity="0.8" />
+                    <ellipse cx="49" cy="72" rx="3" ry="5" fill="#4CAF50" transform="rotate(15 49 72)" />
+                    <ellipse cx="53" cy="67" rx="3" ry="5" fill="#4CAF50" transform="rotate(-15 53 67)" />
+                    <ellipse cx="46" cy="62" rx="3" ry="5" fill="#4CAF50" transform="rotate(30 46 62)" />
+                    <path d="M60,18 C65,15 75,20 72,28 C69,32 62,28 60,18 Z" fill="#FFF59D" />
+                    <circle cx="66" cy="22" r="2" fill="#FFEE58" />
+                    <line x1="48" y1="50" x2="30" y2="8" stroke="#E53935" stroke-width="4.5" stroke-linecap="round" />
+                </svg>
+            </div>
+            <div class="card-body">
+                <h3 class="food-title">Es Cendol Durian</h3>
+                <p class="food-desc">Cendol kenyal pandan dengan susu kelapa gurih, sirup aren pekat, dan toping durian segar beraroma manis.</p>
+                <div class="price-row">
+                    <span class="price">Rp 18.000</span>
+                    <button class="btn-order" onclick="tambahKeKeranjang('Es Cendol Durian', 18000)">
+                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 6. Es Kelapa Muda -->
+        <div class="menu-card" data-category="minuman">
+            <div class="food-image-container">
+                <svg class="food-svg" viewBox="0 0 100 100">
+                    <path d="M30,35 C30,65 70,65 70,35 Z" fill="#4CAF50" />
+                    <path d="M30,35 Q50,45 70,35 Z" fill="#E8F5E9" />
+                    <path d="M35,37 Q50,45 65,37 C65,55 35,55 Z" fill="#FFFFFF" />
+                    <rect x="42" y="30" width="10" height="10" rx="2" fill="#E0F7FA" opacity="0.8" transform="rotate(25 47 35)" />
+                    <rect x="52" y="26" width="10" height="10" rx="2" fill="#E0F7FA" opacity="0.8" transform="rotate(-15 57 31)" />
+                    <line x1="50" y1="40" x2="62" y2="10" stroke="#FFB300" stroke-width="4.5" stroke-linecap="round" />
+                    <circle cx="33" cy="35" r="8" fill="#7CB342" />
+                    <circle cx="33" cy="35" r="6" fill="#C5E1A5" />
+                </svg>
+            </div>
+            <div class="card-body">
+                <h3 class="food-title">Es Kelapa Muda</h3>
+                <p class="food-desc">Air kelapa murni dingin dengan serutan daging kelapa lembut yang sangat menyegarkan dahaga Anda.</p>
+                <div class="price-row">
+                    <span class="price">Rp 15.000</span>
+                    <button class="btn-order" onclick="tambahKeKeranjang('Es Kelapa Muda', 15000)">
+                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 7. Pisang Goreng Keju -->
+        <div class="menu-card" data-category="cemilan">
+            <div class="food-image-container">
+                <svg class="food-svg" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" fill="#795548" />
+                    <circle cx="50" cy="50" r="35" fill="#EEEEEE" />
+                    <path d="M30,55 C40,40 55,40 65,52" fill="none" stroke="#FFB300" stroke-width="12" stroke-linecap="round" />
+                    <path d="M38,62 C48,47 63,47 73,59" fill="none" stroke="#FFA000" stroke-width="11" stroke-linecap="round" />
+                    <line x1="38" y1="45" x2="48" y2="48" stroke="#FFD54F" stroke-width="2.5" stroke-linecap="round" />
+                    <line x1="43" y1="42" x2="53" y2="44" stroke="#FFD54F" stroke-width="2.5" stroke-linecap="round" />
+                    <line x1="48" y1="46" x2="58" y2="49" stroke="#FFD54F" stroke-width="2.5" stroke-linecap="round" />
+                    <line x1="55" y1="43" x2="65" y2="46" stroke="#FFD54F" stroke-width="2.5" stroke-linecap="round" />
+                    <line x1="40" y1="52" x2="44" y2="54" stroke="#3E2723" stroke-width="2" />
+                    <line x1="50" y1="49" x2="54" y2="51" stroke="#3E2723" stroke-width="2" />
+                    <line x1="60" y1="51" x2="64" y2="53" stroke="#3E2723" stroke-width="2" />
+                </svg>
+            </div>
+            <div class="card-body">
+                <h3 class="food-title">Pisang Goreng Keju</h3>
+                <p class="food-desc">Pisang goreng renyah bertopping parutan keju cheddar gurih dan taburan butiran cokelat manis.</p>
+                <div class="price-row">
+                    <span class="price">Rp 12.000</span>
+                    <button class="btn-order" onclick="tambahKeKeranjang('Pisang Goreng Keju', 12000)">
+                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 8. Bakwan Jagung -->
+        <div class="menu-card" data-category="cemilan">
+            <div class="food-image-container">
+                <svg class="food-svg" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="36" fill="#FFC107" opacity="0.9" />
+                    <circle cx="36" cy="45" r="4" fill="#FFA000" />
+                    <circle cx="48" cy="38" r="4" fill="#FFA000" />
+                    <circle cx="62" cy="46" r="4" fill="#FF8F00" />
+                    <circle cx="50" cy="62" r="4" fill="#FF8F00" />
+                    <circle cx="38" cy="56" r="4" fill="#FFA000" />
+                    <ellipse cx="44" cy="48" rx="2.5" ry="4" fill="#FFF59D" transform="rotate(15 44 48)" />
+                    <ellipse cx="54" cy="42" rx="2.5" ry="4" fill="#FFF59D" transform="rotate(-30 54 42)" />
+                    <ellipse cx="40" cy="40" rx="2.5" ry="4" fill="#FFF9C4" transform="rotate(45 40 40)" />
+                    <ellipse cx="58" cy="52" rx="2.5" ry="4" fill="#FFF59D" transform="rotate(10 58 52)" />
+                    <ellipse cx="48" cy="55" rx="2.5" ry="4" fill="#FFF9C4" transform="rotate(-15 48 55)" />
+                    <rect x="42" y="32" width="2" height="6" rx="1" fill="#4CAF50" transform="rotate(20 42 32)" />
+                    <rect x="58" y="44" width="2" height="6" rx="1" fill="#4CAF50" transform="rotate(-40 58 44)" />
+                    <rect x="46" y="58" width="2" height="6" rx="1" fill="#4CAF50" transform="rotate(10 46 58)" />
+                    <path d="M68,60 Q75,55 78,65 C76,68 70,68 68,60 Z" fill="#E53935" />
+                    <path d="M78,65 Q80,68 81,67" fill="none" stroke="#4CAF50" stroke-width="1.5" />
+                </svg>
+            </div>
+            <div class="card-body">
+                <h3 class="food-title">Bakwan Jagung</h3>
+                <p class="food-desc">Fritter jagung manis yang renyah di luar dan empuk di dalam, disajikan hangat dengan cabai rawit.</p>
+                <div class="price-row">
+                    <span class="price">Rp 10.000</span>
+                    <button class="btn-order" onclick="tambahKeKeranjang('Bakwan Jagung', 10000)">
+                        <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty State Container -->
+        <div class="empty-state" id="emptyState">
+            <div class="empty-state-icon">🍽️</div>
+            <p>Menu kuliner tidak ditemukan.</p>
+            <p style="font-size: 0.8rem; color: #555; margin-top: 5px;">Silakan coba kata kunci pencarian yang lain.</p>
+        </div>
+    </main>
+
+    <!-- Floating Shopping Cart Bar -->
+    <div id="cartBar" class="cart-bar">
+        <div class="cart-info">
+            <div class="cart-icon-container">
+                <span style="font-size: 1.4rem;">🛒</span>
+                <span id="cartCount" class="cart-badge">0</span>
+            </div>
+            <div class="cart-text">
+                <h4 id="lastAddedTitle">Belum ada pesanan</h4>
+                <p id="cartItemsDetail">Ketuk tombol + untuk memesan</p>
+            </div>
+        </div>
+        <button class="btn-view-cart" onclick="bukaReceiptModal()">Checkout</button>
+    </div>
+
+    <!-- Premium Receipt Modal Overlay -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="receipt-modal">
+            <div class="receipt-header">
+                <h3>STRUK BELANJA</h3>
+                <p>Web Kuliner Terinvestasi & Terpercaya</p>
+                <p id="receiptDate"></p>
+            </div>
+            
+            <!-- Items List -->
+            <div class="receipt-items" id="receiptItems">
+                <!-- Rincian item dimasukkan lewat javascript -->
+            </div>
+
+            <!-- Price Summary -->
+            <div class="receipt-summary-block">
+                <div class="summary-row">
+                    <span>Subtotal</span>
+                    <span id="summarySubtotal">Rp 0</span>
+                </div>
+                <div class="summary-row">
+                    <span>Biaya Layanan</span>
+                    <span>Rp 3.000</span>
+                </div>
+                <div class="summary-row">
+                    <span>Pajak (PB1 10%)</span>
+                    <span id="summaryTax">Rp 0</span>
+                </div>
+                <div class="grand-total-row">
+                    <span>Total Bayar</span>
+                    <span id="summaryGrandTotal">Rp 0</span>
+                </div>
+            </div>
+
+            <!-- Buttons -->
+            <div class="modal-buttons">
+                <button class="btn-modal btn-modal-wa" onclick="bayarViaWhatsApp()">
+                    <span>💬</span> Pesan via WhatsApp
+                </button>
+                <button class="btn-modal btn-modal-kasir" onclick="bayarDiKasir()">
+                    <span>🛎️</span> Ambil di Tempat & Bayar Kasir
+                </button>
+                <button class="btn-modal btn-modal-batal" onclick="tutupReceiptModal()">Kembali</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let totalItems = 0;
+        let selectedItems = {};
+        let activeCategory = 'semua';
+
+        // Load data cart yang tersimpan dari LocalStorage jika ada (Agar tetap aman pas di-refresh)
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedItems = localStorage.getItem('kuliner_cart_items');
+            const savedTotal = localStorage.getItem('kuliner_cart_total');
+            if (savedItems && savedTotal) {
+                selectedItems = JSON.parse(savedItems);
+                totalItems = parseInt(savedTotal);
+                if (totalItems > 0) {
+                    updateCartBarVisual("Keranjang dipulihkan");
+                }
+            }
+        });
+
+        // Filter kategori menu
+        function setCategory(category, element) {
+            activeCategory = category;
+            
+            // Ubah class active tombol
+            const buttons = document.querySelectorAll('.filter-btn');
+            buttons.forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+
+            filterMenu();
+        }
+
+        // Cari & filter menu secara live
+        function filterMenu() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const cards = document.querySelectorAll('.menu-card');
+            let foundCount = 0;
+
+            cards.forEach(card => {
+                const title = card.querySelector('.food-title').innerText.toLowerCase();
+                const desc = card.querySelector('.food-desc').innerText.toLowerCase();
+                const category = card.getAttribute('data-category');
+
+                const matchesQuery = title.includes(query) || desc.includes(query);
+                const matchesCategory = activeCategory === 'semua' || category === activeCategory;
+
+                if (matchesQuery && matchesCategory) {
+                    card.classList.remove('hidden');
+                    foundCount++;
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+
+            const emptyState = document.getElementById('emptyState');
+            if (foundCount === 0) {
+                emptyState.style.display = 'block';
+            } else {
+                emptyState.style.display = 'none';
+            }
+        }
+
+        // Tambah ke keranjang dengan parameter harga
+        function tambahKeKeranjang(namaMenu, harga) {
+            totalItems++;
+            if (selectedItems[namaMenu]) {
+                selectedItems[namaMenu].qty++;
+            } else {
+                selectedItems[namaMenu] = { qty: 1, price: harga };
+            }
+
+            // Simpan ke LocalStorage
+            localStorage.setItem('kuliner_cart_items', JSON.stringify(selectedItems));
+            localStorage.setItem('kuliner_cart_total', totalItems.toString());
+
+            // Update UI Keranjang
+            updateCartBarVisual(namaMenu);
+
+            // Jembatan komunikasi ke Native Android (Toast)
+            if (window.Android && typeof window.Android.showToast === 'function') {
+                window.Android.showToast(namaMenu);
+            } else {
+                console.log("Java Bridge showToast dipanggil untuk: " + namaMenu);
+            }
+        }
+
+        // Update visual keranjang floating
+        function updateCartBarVisual(lastAdded) {
+            const cartBar = document.getElementById('cartBar');
+            const cartCount = document.getElementById('cartCount');
+            const lastAddedTitle = document.getElementById('lastAddedTitle');
+            const cartItemsDetail = document.getElementById('cartItemsDetail');
+
+            cartBar.classList.add('active');
+            cartCount.innerText = totalItems;
+            
+            // Animasi pop badge
+            cartCount.style.animation = 'none';
+            setTimeout(() => {
+                cartCount.style.animation = 'popBadge 0.3s ease';
+            }, 10);
+
+            lastAddedTitle.innerText = lastAdded;
+            cartItemsDetail.innerText = totalItems + " item sukses dipilih";
+        }
+
+        // Buka Struk Belanja Modal
+        function bukaReceiptModal() {
+            if (totalItems === 0) {
+                return;
+            }
+
+            // Tampilkan tanggal hari ini
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute:'2-digit' };
+            document.getElementById('receiptDate').innerText = new Date().toLocaleDateString('id-ID', options);
+
+            const receiptContainer = document.getElementById('receiptItems');
+            receiptContainer.innerHTML = '';
+
+            let subtotal = 0;
+            for (let name in selectedItems) {
+                const item = selectedItems[name];
+                const itemCost = item.qty * item.price;
+                subtotal += itemCost;
+
+                const row = document.createElement('div');
+                row.className = 'receipt-item-row';
+                row.innerHTML = `
+                    <span class="receipt-item-name">${name} (x${item.qty})</span>
+                    <span class="receipt-item-price">Rp ${itemCost.toLocaleString('id-ID')}</span>
+                `;
+                receiptContainer.appendChild(row);
+            }
+
+            const tax = Math.round(subtotal * 0.1);
+            const grandTotal = subtotal + 3000 + tax;
+
+            document.getElementById('summarySubtotal').innerText = `Rp ${subtotal.toLocaleString('id-ID')}`;
+            document.getElementById('summaryTax').innerText = `Rp ${tax.toLocaleString('id-ID')}`;
+            document.getElementById('summaryGrandTotal').innerText = `Rp ${grandTotal.toLocaleString('id-ID')}`;
+
+            document.getElementById('modalOverlay').classList.add('active');
+        }
+
+        function tutupReceiptModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+        }
+
+        // Checkout 1: Whatsapp Link Integration (Skema yang ditangkap secara native di Android)
+        function bayarViaWhatsApp() {
+            let detailText = "";
+            let subtotal = 0;
+            for (let name in selectedItems) {
+                const item = selectedItems[name];
+                detailText += `%E2%80%A2 ${name} (x${item.qty})%0A`;
+                subtotal += item.qty * item.price;
+            }
+            
+            const tax = Math.round(subtotal * 0.1);
+            const grandTotal = subtotal + 3000 + tax;
+            
+            const phone = "628512345678"; // Ganti dengan nomor WhatsApp Restoran Anda
+            const message = `Halo, saya ingin memesan menu lezat berikut:%0A%0A${detailText}%0ABiaya Layanan: Rp 3.000%0APajak (10%): Rp ${tax.toLocaleString('id-ID')}%0A*Total Bayar: Rp ${grandTotal.toLocaleString('id-ID')}*%0A%0AMohon diproses ya!`;
+            
+            const waUrl = `https://api.whatsapp.com/send?phone=${phone}&text=${message}`;
+            
+            // Reset keranjang lokal
+            bersihkanKeranjang();
+            tutupReceiptModal();
+
+            // WebView akan menangkap url ini secara native dan membuka aplikasi WhatsApp
+            window.location.href = waUrl;
+        }
+
+        // Checkout 2: Bayar di kasir terdekat dengan memicu Notifikasi Native Android
+        function bayarDiKasir() {
+            const orderCode = "KUL-" + Math.floor(Math.random() * 90000 + 10000);
+            
+            // Jembatan komunikasi ke Native Android (Notification Tray)
+            if (window.Android && typeof window.Android.showNotification === 'function') {
+                window.Android.showNotification(
+                    "Pesanan Berhasil Dibuat!",
+                    "Kode order Anda: " + orderCode + ". Silakan tunjukkan ke kasir untuk proses pembayaran."
+                );
+            } else {
+                alert(`Pesanan Berhasil!\n\nKode Order Anda: ${orderCode}\n\nSilakan sebutkan kode ini di kasir untuk melakukan pembayaran.`);
+            }
+
+            bersihkanKeranjang();
+            tutupReceiptModal();
+        }
+
+        function bersihkanKeranjang() {
+            totalItems = 0;
+            selectedItems = {};
+            localStorage.removeItem('kuliner_cart_items');
+            localStorage.removeItem('kuliner_cart_total');
+            document.getElementById('cartBar').classList.remove('active');
+        }
+    </script>
+</body>
+</html>

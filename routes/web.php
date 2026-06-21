@@ -119,10 +119,95 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // SEMENTARA: Rute inject data dummy (hapus setelah selesai testing)
     Route::get('/seed-dummy', function () {
         try {
-            \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
-            return response()->json(['success' => true, 'message' => 'Data dummy berhasil disuntikkan!', 'output' => \Illuminate\Support\Facades\Artisan::output()]);
+            $results = [];
+
+            // 1. Tambah Karyawan Dummy
+            $dummyUsers = [
+                ['name' => 'Budi Santoso', 'email' => 'budi@absensi.app', 'employee_id' => 'KRY005', 'department' => 'Keuangan', 'position' => 'Staff Keuangan', 'phone' => '08123456789'],
+                ['name' => 'Siti Rahayu', 'email' => 'siti@absensi.app', 'employee_id' => 'KRY006', 'department' => 'HR', 'position' => 'HR Officer', 'phone' => '08123456780'],
+                ['name' => 'Agus Setiawan', 'email' => 'agus@absensi.app', 'employee_id' => 'KRY007', 'department' => 'Operasional', 'position' => 'Staff Operasional', 'phone' => '08111222333'],
+                ['name' => 'Dewi Lestari', 'email' => 'dewi@absensi.app', 'employee_id' => 'KRY008', 'department' => 'Marketing', 'position' => 'Staff Marketing', 'phone' => '08111222444'],
+                ['name' => 'Reza Pramana', 'email' => 'reza@absensi.app', 'employee_id' => 'KRY009', 'department' => 'IT', 'position' => 'Web Developer', 'phone' => '08111222555'],
+            ];
+
+            foreach ($dummyUsers as $du) {
+                \App\Models\User::updateOrCreate(
+                    ['email' => $du['email']],
+                    array_merge($du, [
+                        'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                        'role' => 'karyawan',
+                        'is_active' => true,
+                    ])
+                );
+            }
+            $results['users_created'] = count($dummyUsers);
+
+            // 2. Inject Attendance Dummy 14 Hari Terakhir
+            $locations = \App\Models\Location::all();
+            $users = \App\Models\User::where('role', 'karyawan')->get();
+            $today = \Illuminate\Support\Carbon::today();
+            $attCount = 0;
+
+            if ($locations->isNotEmpty() && $users->isNotEmpty()) {
+                foreach ($users as $u) {
+                    for ($i = 1; $i <= 14; $i++) {
+                        $date = $today->copy()->subDays($i);
+                        if ($date->isSunday()) continue;
+
+                        $exists = \App\Models\Attendance::where('user_id', $u->id)->whereDate('date', $date)->exists();
+                        if ($exists) continue;
+
+                        $loc = $locations->random();
+                        $isLate = rand(0, 100) > 80;
+                        $isMangkir = rand(0, 100) > 95;
+
+                        if ($isMangkir) {
+                            \App\Models\Attendance::create([
+                                'user_id' => $u->id,
+                                'date' => $date,
+                                'status' => 'Mangkir',
+                            ]);
+                        } else {
+                            $clockIn = $isLate
+                                ? $date->copy()->setTime(rand(8, 9), rand(31, 59), 0)
+                                : $date->copy()->setTime(rand(7, 8), rand(0, 29), 0);
+                            $clockOut = $clockIn->copy()->addHours(rand(8, 10))->addMinutes(rand(0, 59));
+
+                            \App\Models\Attendance::create([
+                                'user_id' => $u->id,
+                                'location_id' => $loc->id,
+                                'date' => $date,
+                                'clock_in' => $clockIn,
+                                'clock_in_latitude' => $loc->latitude + (rand(-100, 100) / 1000000),
+                                'clock_in_longitude' => $loc->longitude + (rand(-100, 100) / 1000000),
+                                'clock_in_distance' => rand(5, max(6, $loc->radius - 5)),
+                                'clock_in_photo' => 'https://ui-avatars.com/api/?name=' . urlencode($u->name) . '&background=random&color=fff&size=600',
+                                'clock_out' => $clockOut,
+                                'clock_out_latitude' => $loc->latitude + (rand(-100, 100) / 1000000),
+                                'clock_out_longitude' => $loc->longitude + (rand(-100, 100) / 1000000),
+                                'clock_out_distance' => rand(5, max(6, $loc->radius - 5)),
+                                'clock_out_photo' => 'https://ui-avatars.com/api/?name=' . urlencode($u->name) . '&background=random&color=fff&size=600',
+                                'status' => $isLate ? 'Telat' : 'Hadir',
+                            ]);
+                        }
+                        $attCount++;
+                    }
+                }
+            }
+            $results['attendance_created'] = $attCount;
+            $results['total_karyawan'] = $users->count();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Data dummy berhasil disuntikkan!',
+                'details' => $results,
+            ]);
         } catch (\Exception $e) {
-            return response()->json(['success' => false, 'message' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => $e->getMessage(),
+                'file' => basename($e->getFile()) . ':' . $e->getLine(),
+            ]);
         }
     })->name('seed-dummy');
 });

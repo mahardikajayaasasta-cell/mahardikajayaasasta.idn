@@ -3,28 +3,38 @@ package com.mja.absensi
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
+import android.view.View
+import android.webkit.CookieManager
+import android.webkit.DownloadListener
 import android.webkit.GeolocationPermissions
+import android.webkit.URLUtil
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
+import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -33,6 +43,9 @@ import java.util.Locale
 class MainActivity : AppCompatActivity() {
 
     private lateinit var webView: WebView
+    private lateinit var swipeRefresh: SwipeRefreshLayout
+    private lateinit var progressBar: ProgressBar
+
     private val PERMISSION_REQUEST_CODE = 123
     private val FILECHOOSER_RESULTCODE = 101
 
@@ -48,6 +61,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         webView = findViewById(R.id.webView)
+        swipeRefresh = findViewById(R.id.swipeRefresh)
+        progressBar = findViewById(R.id.progressBar)
         
         // 1. Cek Keamanan Dulu (Anti Root / Emulator)
         if (isDeviceRooted()) {
@@ -61,6 +76,16 @@ class MainActivity : AppCompatActivity() {
             return
         }
 
+        // FITUR 1: Swipe to Refresh (Tarik ke Bawah untuk Memuat Ulang)
+        swipeRefresh.setOnRefreshListener {
+            if (isNetworkAvailable()) {
+                webView.reload()
+            } else {
+                swipeRefresh.isRefreshing = false
+                Toast.makeText(this, "Tidak ada koneksi internet", Toast.LENGTH_SHORT).show()
+            }
+        }
+
         setupWebView()
         checkPermissions()
     }
@@ -71,13 +96,21 @@ class MainActivity : AppCompatActivity() {
         webSettings.domStorageEnabled = true
         webSettings.setGeolocationEnabled(true)
         webSettings.allowFileAccess = true
-
         webSettings.useWideViewPort = true
         webSettings.loadWithOverviewMode = true
 
-        webView.webViewClient = WebViewClient()
-        
+        // FITUR 2: Progress Bar & Loading Indicator
         webView.webChromeClient = object : WebChromeClient() {
+            override fun onProgressChanged(view: WebView?, newProgress: Int) {
+                super.onProgressChanged(view, newProgress)
+                if (newProgress == 100) {
+                    progressBar.visibility = View.GONE
+                    swipeRefresh.isRefreshing = false
+                } else {
+                    progressBar.visibility = View.VISIBLE
+                    progressBar.progress = newProgress
+                }
+            }
             
             // Mengizinkan lokasi secara diam-diam (karena permisi native sudah diminta)
             override fun onGeolocationPermissionsShowPrompt(
@@ -88,7 +121,6 @@ class MainActivity : AppCompatActivity() {
             }
 
             // ANTI FAKE KAMERA & GALLERY CATCHER
-            // Memaksa input type="file" di web untuk membuka Kamera Native dan BUKAN Galeri
             override fun onShowFileChooser(
                 webView: WebView?,
                 filePathCallback: ValueCallback<Array<Uri>>?,
@@ -98,17 +130,11 @@ class MainActivity : AppCompatActivity() {
                     mUploadMessage?.onReceiveValue(null)
                 }
                 mUploadMessage = filePathCallback
-
-                // Buat file sementara untuk tangkapan kamera
                 val timeStamp: String = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
                 val imageFile = File.createTempFile("JPEG_${timeStamp}_", ".jpg", cacheDir)
-                
-                // Gunakan FileProvider agar aman di Android 7.0+
                 photoURI = FileProvider.getUriForFile(this@MainActivity, "${applicationContext.packageName}.provider", imageFile)
-
                 val captureIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
                 captureIntent.putExtra(MediaStore.EXTRA_OUTPUT, photoURI)
-
                 try {
                     startActivityForResult(captureIntent, FILECHOOSER_RESULTCODE)
                 } catch (e: Exception) {
@@ -118,9 +144,39 @@ class MainActivity : AppCompatActivity() {
                 return true
             }
         }
+
+        // FITUR 3: Penanganan Koneksi Terputus (Network Error Handler)
+        webView.webViewClient = object : WebViewClient() {
+            override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
+                super.onReceivedError(view, request, error)
+                if(!isNetworkAvailable()) {
+                    Toast.makeText(this@MainActivity, "Koneksi terputus. Geser ke bawah untuk muat ulang.", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+
+        // FITUR 4: Download Manager Support (Bisa mengunduh PDF/Excel Laporan dari Web)
+        webView.setDownloadListener { url, userAgent, contentDisposition, mimetype, contentLength ->
+            try {
+                val request = DownloadManager.Request(Uri.parse(url))
+                request.setMimeType(mimetype)
+                request.addRequestHeader("cookie", CookieManager.getInstance().getCookie(url))
+                request.addRequestHeader("User-Agent", userAgent)
+                request.setDescription("Mengunduh file...")
+                request.setTitle(URLUtil.guessFileName(url, contentDisposition, mimetype))
+                request.allowScanningByMediaScanner()
+                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
+                request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(url, contentDisposition, mimetype))
+                
+                val dm = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
+                dm.enqueue(request)
+                Toast.makeText(applicationContext, "Mendownload file...", Toast.LENGTH_LONG).show()
+            } catch (e: Exception) {
+                Toast.makeText(applicationContext, "Gagal memulai unduhan", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
-    // Penanganan Hasil Foto Kamera Kembali ke WebView (Lapisan Web)
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (requestCode == FILECHOOSER_RESULTCODE) {
             if (mUploadMessage == null) return
@@ -144,7 +200,8 @@ class MainActivity : AppCompatActivity() {
         val permissions = arrayOf(
             Manifest.permission.ACCESS_FINE_LOCATION,
             Manifest.permission.ACCESS_COARSE_LOCATION,
-            Manifest.permission.CAMERA
+            Manifest.permission.CAMERA,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
 
         val permissionsNeedReq = permissions.filter {
@@ -168,23 +225,57 @@ class MainActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            loadWebApp()
-        }
+        loadWebApp() // Tetap load webApp meski ditolak sebagian agar user tau batasannya
     }
 
     private fun loadWebApp() {
-        webView.loadUrl(webAppUrl)
+        if (isNetworkAvailable()) {
+            webView.loadUrl(webAppUrl)
+        } else {
+            Toast.makeText(this, "Tidak ada koneksi internet!", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    // Utilitas Cek Internet
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val network = connectivityManager.activeNetwork ?: return false
+            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+            return when {
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> true
+                else -> false
+            }
+        } else {
+            @Suppress("DEPRECATION")
+            val networkInfo = connectivityManager.activeNetworkInfo ?: return false
+            @Suppress("DEPRECATION")
+            return networkInfo.isConnected
+        }
+    }
+
+    // FITUR 5: Konfirmasi Dialog Keluar Aplikasi (Mencegah salah pencet tombol Back)
+    @Deprecated("Deprecated in Java", ReplaceWith("if (webView.canGoBack()) webView.goBack() else showExitConfirmation()"))
+    override fun onBackPressed() {
+        if (webView.canGoBack()) {
+            webView.goBack()
+        } else {
+            AlertDialog.Builder(this)
+                .setTitle("Keluar Aplikasi")
+                .setMessage("Apakah Anda yakin ingin keluar dari aplikasi absensi?")
+                .setPositiveButton("Ya") { _, _ -> super.onBackPressed() }
+                .setNegativeButton("Tidak", null)
+                .show()
+        }
     }
 
     // -------------------------------------------------------------
-    // FITUR KEAMANAN SIDANG PROGRAM (ANTI CHEAT / ANTI FAKE)
+    // FITUR KEAMANAN (ANTI CHEAT / ANTI FAKE)
     // -------------------------------------------------------------
-
-    // 1. ANTI FAKE GPS (Deteksi Fake GPS Apps & Developer Option)
     private fun isMockSettingsON(): Boolean {
         try {
-            // Metode A: Cek setting developer "Allow Mock Location" (Android < 6.0)
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
                 val mockLocation = Settings.Secure.getString(
                     contentResolver,
@@ -194,39 +285,23 @@ class MainActivity : AppCompatActivity() {
                     return true
                 }
             }
-
-            // Metode B: Scan aplikasi Fake GPS yang terinstall di HP (Android 6.0+)
-            // Daftar package name aplikasi Fake GPS populer
             val fakeGpsPackages = arrayOf(
-                "com.lexa.fakegps",               // Fake GPS Location
-                "com.incorporateapps.fakegps",     // Fake GPS GO
-                "com.fakegps.mock",                // Mock GPS
-                "com.blogspot.newapphorizons.fakegps", // Fake GPS Free
-                "ru.gavrikov.mocklocations",       // Mock Locations
-                "com.evezzon.fakegps",             // Fake GPS Joystick
-                "com.theappninjas.gpsjoystick",    // GPS JoyStick
-                "com.divi.fakeGPS",                // Fake GPS
-                "fr.dvilleneuve.lockito"           // Lockito (developer tool)
+                "com.lexa.fakegps", "com.incorporateapps.fakegps", "com.fakegps.mock", 
+                "com.blogspot.newapphorizons.fakegps", "ru.gavrikov.mocklocations", 
+                "com.evezzon.fakegps", "com.theappninjas.gpsjoystick", 
+                "com.divi.fakeGPS", "fr.dvilleneuve.lockito"
             )
-
             val pm = packageManager
             for (packageName in fakeGpsPackages) {
                 try {
                     pm.getPackageInfo(packageName, PackageManager.GET_META_DATA)
-                    // Jika tidak error, berarti aplikasi Fake GPS terinstall!
                     return true
-                } catch (e: PackageManager.NameNotFoundException) {
-                    // Aplikasi tidak ditemukan, lanjut cek yang lain
-                }
+                } catch (e: PackageManager.NameNotFoundException) {}
             }
-
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
+        } catch (e: Exception) { e.printStackTrace() }
         return false
     }
 
-    // 2. ANTI ROOT / EMULATOR (Check for common su binaries & test tags)
     private fun isDeviceRooted(): Boolean {
         return checkRootMethod1() || checkRootMethod2() || checkRootMethod3()
     }
@@ -268,14 +343,5 @@ class MainActivity : AppCompatActivity() {
             .setCancelable(false)
             .setPositiveButton("Tutup Aplikasi") { _, _ -> finish() }
             .show()
-    }
-
-    @Deprecated("Deprecated in Java", ReplaceWith("if (webView.canGoBack()) webView.goBack() else super.onBackPressed()"))
-    override fun onBackPressed() {
-        if (webView.canGoBack()) {
-            webView.goBack()
-        } else {
-            super.onBackPressed()
-        }
     }
 }

@@ -76,14 +76,14 @@ class AttendanceController
                 $location->radius
             );
 
-            // DITUTUP SEMENTARA UNTUK TESTING
-            // if (!$check['within']) {
-            //     return response()->json([
-            //         'success'  => false,
-            //         'message'  => "Anda berada di luar radius lokasi kerja. Jarak Anda: {$check['distance']} meter.",
-            //         'distance' => $check['distance'],
-            //     ], 422);
-            // }
+            // Validasi: Tolak absen jika di luar radius lokasi kantor
+            if (!$check['within']) {
+                return response()->json([
+                    'success'  => false,
+                    'message'  => "Anda berada di luar radius lokasi kerja. Jarak Anda: {$check['distance']} meter (maks {$location->radius}m).",
+                    'distance' => $check['distance'],
+                ], 422);
+            }
 
             // Upload foto ke Cloudinary
             $photoUrl = $this->uploadPhotoToCloudinary($request->photo, $user->id, 'clock_in');
@@ -190,14 +190,14 @@ class AttendanceController
             $location->radius
         );
 
-        // DITUTUP SEMENTARA UNTUK TESTING
-        // if (!$check['within']) {
-        //     return response()->json([
-        //         'success'  => false,
-        //         'message'  => "Anda berada di luar radius lokasi kerja. Jarak Anda: {$check['distance']} meter.",
-        //         'distance' => $check['distance'],
-        //     ], 422);
-        // }
+        // Validasi: Tolak absen pulang jika di luar radius lokasi kantor
+        if (!$check['within']) {
+            return response()->json([
+                'success'  => false,
+                'message'  => "Anda berada di luar radius lokasi kerja. Jarak Anda: {$check['distance']} meter (maks {$location->radius}m).",
+                'distance' => $check['distance'],
+            ], 422);
+        }
 
         // Upload foto clock out
         $photoUrl = $this->uploadPhotoToCloudinary($request->photo, $user->id, 'clock_out');

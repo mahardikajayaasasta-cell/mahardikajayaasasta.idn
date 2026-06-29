@@ -32,7 +32,9 @@
         <!-- 2. Ubah MainActivity menjadi activity biasa tanpa intent-filter utama -->
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
+            android:exported="false"
+            android:label="Ahmad Zidan"
+            android:theme="@style/Theme.AbsensiMJA.ActionBar" />
 
         <!-- Tambahan Provider untuk Kamera milikmu yang sudah ada di MainActivity -->
         <provider

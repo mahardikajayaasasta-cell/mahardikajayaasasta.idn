@@ -40,7 +40,7 @@ class MainActivity : AppCompatActivity() {
     private var photoURI: Uri? = null
 
     // URL Vercel Laravel Anda
-    private val webAppUrl = "https://absensi-mja.vercel.app/" 
+    private val webAppUrl = "https://mahardikajayaasasta-idn.vercel.app/" 
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {

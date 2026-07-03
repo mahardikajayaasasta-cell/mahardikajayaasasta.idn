@@ -19,6 +19,7 @@
 
     <properties>
         <java.version>21</java.version>
+        <start-class>com.ahmadzidan.hotelreservasi.HotelReservasiApplication</start-class>
     </properties>
 
     <dependencies>

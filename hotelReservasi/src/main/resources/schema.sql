@@ -9,6 +9,7 @@ CREATE DATABASE IF NOT EXISTS `hotel_reservasi` CHARACTER SET utf8mb4 COLLATE ut
 USE `hotel_reservasi`;
 
 -- Buat tabel reservasi sesuai spesifikasi Entity POJO
+DROP TABLE IF EXISTS `reservasi`;
 CREATE TABLE IF NOT EXISTS `reservasi` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `nama_tamu` VARCHAR(255) NOT NULL,
@@ -25,4 +26,12 @@ INSERT INTO `reservasi` (`nama_tamu`, `tipe_kamar`, `nomor_kamar`, `tanggal_chec
 VALUES 
 ('Zidan Ahmad', 'Deluxe', 'D-1', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 2 DAY), 'AKTIF'),
 ('Budi Santoso', 'Standard', 'S-1', DATE_ADD(CURDATE(), INTERVAL 1 DAY), DATE_ADD(CURDATE(), INTERVAL 3 DAY), 'AKTIF'),
-('Siti Aminah', 'Suite', 'U-1', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 DAY), 'SELESAI');
+('Siti Aminah', 'Suite', 'U-1', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 DAY), 'SELESAI'),
+('Ahmad Fauzi', 'Standard', 'S-2', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 3 DAY), 'AKTIF'),
+('Dewi Lestari', 'Deluxe', 'D-2', DATE_ADD(CURDATE(), INTERVAL 2 DAY), DATE_ADD(CURDATE(), INTERVAL 4 DAY), 'AKTIF'),
+('Rendi Wijaya', 'Suite', 'U-2', DATE_ADD(CURDATE(), INTERVAL 1 DAY), DATE_ADD(CURDATE(), INTERVAL 3 DAY), 'AKTIF'),
+('Megawati Putri', 'President Suite', 'P-1', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 5 DAY), 'AKTIF'),
+('Hendra Kurniawan', 'Standard', 'S-3', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 2 DAY), 'SELESAI'),
+('Lilis Suryani', 'Deluxe', 'D-3', DATE_ADD(CURDATE(), INTERVAL 3 DAY), DATE_ADD(CURDATE(), INTERVAL 5 DAY), 'AKTIF'),
+('Aditya Pratama', 'Standard', 'S-4', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 DAY), 'SELESAI');
+

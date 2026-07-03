@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error | Hotel Reservasi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary-custom shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" th:href="@{/}">
+                <i class="bi bi-building"></i> Hotel Reservasi
+            </a>
+        </div>
+    </nav>
+
+    <div class="container mt-5 mb-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 text-center">
+                <div class="card shadow border-0">
+                    <div class="card-body p-5">
+                        <div class="display-1 mb-3" th:text="${errorIcon} ?: '⚠️'">⚠️</div>
+                        <h2 class="fw-bold text-danger mb-3" th:text="${errorTitle} ?: 'Terjadi Kesalahan'">Error</h2>
+                        <p class="text-muted fs-5 mb-4"
+                            th:text="${errorMessage} ?: 'Maaf, terjadi kesalahan pada sistem.'">Pesan error</p>
+                        <a th:href="@{/}" class="btn btn-primary btn-lg">
+                            <i class="bi bi-house"></i> Kembali ke Beranda
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-light text-center py-3">
+        <small>&copy; 2026 Ahmad Zidan - Tugas Pemrograman 2 | Spring Boot + Thymeleaf + MySQL</small>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

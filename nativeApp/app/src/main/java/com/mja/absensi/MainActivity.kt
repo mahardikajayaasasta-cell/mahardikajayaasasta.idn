@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
     private var photoURI: Uri? = null
 
     // URL Vercel Laravel Anda
-    private val webAppUrl = "https://mahardikajayaasasta-idn.vercel.app/" 
+    private val webAppUrl = "https://mahardikajayaasasta-idn.vercel.app/"
 
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         webView = findViewById(R.id.webView)
         swipeRefresh = findViewById(R.id.swipeRefresh)
         progressBar = findViewById(R.id.progressBar)
-        
+
         // 1. Cek Keamanan Dulu (Anti Root / Emulator)
         if (isDeviceRooted()) {
             showSecurityAlert("Perangkat Root Terdeteksi", "Aplikasi absensi tidak bisa dijalankan di perangkat root demi keamanan data.")
@@ -111,7 +111,7 @@ class MainActivity : AppCompatActivity() {
                     progressBar.progress = newProgress
                 }
             }
-            
+
             // Mengizinkan lokasi secara diam-diam (karena permisi native sudah diminta)
             override fun onGeolocationPermissionsShowPrompt(
                 origin: String?,
@@ -167,7 +167,7 @@ class MainActivity : AppCompatActivity() {
                 request.allowScanningByMediaScanner()
                 request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
                 request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, URLUtil.guessFileName(url, contentDisposition, mimetype))
-                
+
                 val dm = getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
                 dm.enqueue(request)
                 Toast.makeText(applicationContext, "Mendownload file...", Toast.LENGTH_LONG).show()
@@ -286,9 +286,9 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             val fakeGpsPackages = arrayOf(
-                "com.lexa.fakegps", "com.incorporateapps.fakegps", "com.fakegps.mock", 
-                "com.blogspot.newapphorizons.fakegps", "ru.gavrikov.mocklocations", 
-                "com.evezzon.fakegps", "com.theappninjas.gpsjoystick", 
+                "com.lexa.fakegps", "com.incorporateapps.fakegps", "com.fakegps.mock",
+                "com.blogspot.newapphorizons.fakegps", "ru.gavrikov.mocklocations",
+                "com.evezzon.fakegps", "com.theappninjas.gpsjoystick",
                 "com.divi.fakeGPS", "fr.dvilleneuve.lockito"
             )
             val pm = packageManager

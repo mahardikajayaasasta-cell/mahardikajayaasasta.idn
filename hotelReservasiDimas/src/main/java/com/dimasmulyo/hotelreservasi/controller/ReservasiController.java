@@ -1,7 +1,7 @@
-package com.ahmadzidan.hotelreservasi.controller;
+package com.dimasmulyo.hotelreservasi.controller;
 
-import com.ahmadzidan.hotelreservasi.model.Reservasi;
-import com.ahmadzidan.hotelreservasi.service.ReservasiService;
+import com.dimasmulyo.hotelreservasi.model.Reservasi;
+import com.dimasmulyo.hotelreservasi.service.ReservasiService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

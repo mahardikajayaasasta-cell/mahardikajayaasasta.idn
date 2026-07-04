@@ -1,11 +1,11 @@
-package com.ahmadzidan.hotelreservasi;
+package com.muhammadrido.hotelreservasi;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
  * Aplikasi Reservasi Hotel
- * Tugas Pemrograman 2 - Ahmad Zidan
+ * Tugas Pemrograman 2 - Muhammad Rido
  * Framework: Spring Boot + Thymeleaf + MySQL (JPA/JDBC)
  */
 @SpringBootApplication

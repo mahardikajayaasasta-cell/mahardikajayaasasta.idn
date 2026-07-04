@@ -1,7 +1,7 @@
 -- =============================================
 -- Schema Database untuk Aplikasi Reservasi Hotel
 -- Spring Boot & Spring Data JPA
--- Ahmad Zidan - Tugas Pemrograman 2
+-- Muhammad Rido - Tugas Pemrograman 2
 -- =============================================
 
 -- Buat database jika belum ada
@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS `reservasi` (
 -- Menambahkan data dummy awal untuk pengujian
 INSERT INTO `reservasi` (`nama_tamu`, `tipe_kamar`, `nomor_kamar`, `tanggal_check_in`, `tanggal_check_out`, `status`) 
 VALUES 
-('Zidan Ahmad', 'Deluxe', 'D-1', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 2 DAY), 'AKTIF'),
+('Muhammad Rido', 'Deluxe', 'D-1', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 2 DAY), 'AKTIF'),
 ('Budi Santoso', 'Standard', 'S-1', DATE_ADD(CURDATE(), INTERVAL 1 DAY), DATE_ADD(CURDATE(), INTERVAL 3 DAY), 'AKTIF'),
 ('Siti Aminah', 'Suite', 'U-1', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 1 DAY), 'SELESAI'),
 ('Ahmad Fauzi', 'Standard', 'S-2', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 3 DAY), 'AKTIF'),

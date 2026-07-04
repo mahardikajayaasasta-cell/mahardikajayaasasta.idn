@@ -1,9 +1,9 @@
-package com.ahmadzidan.hotelreservasi.service;
+package com.dimasmulyo.hotelreservasi.service;
 
-import com.ahmadzidan.hotelreservasi.exception.KamarPenuhException;
-import com.ahmadzidan.hotelreservasi.exception.ReservasiNotFoundException;
-import com.ahmadzidan.hotelreservasi.model.Reservasi;
-import com.ahmadzidan.hotelreservasi.repository.ReservasiRepository;
+import com.dimasmulyo.hotelreservasi.exception.KamarPenuhException;
+import com.dimasmulyo.hotelreservasi.exception.ReservasiNotFoundException;
+import com.dimasmulyo.hotelreservasi.model.Reservasi;
+import com.dimasmulyo.hotelreservasi.repository.ReservasiRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;

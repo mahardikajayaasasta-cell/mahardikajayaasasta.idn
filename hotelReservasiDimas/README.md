@@ -1,6 +1,6 @@
 # Aplikasi Reservasi Hotel (Spring Boot + Thymeleaf + MySQL)
 
-Tugas Pemrograman 2 - **Muhammad Rido**
+Tugas Pemrograman 2 - **Dimas Mulyo**
 
 Aplikasi web Reservasi Hotel yang dibangun dengan menggunakan bahasa Java, framework Spring Boot, template engine Thymeleaf, dan database MySQL melalui JPA/JDBC.
 
@@ -22,12 +22,12 @@ Aplikasi web Reservasi Hotel yang dibangun dengan menggunakan bahasa Java, frame
 
 ## 📋 Struktur Folder Project (Standar Spring Boot)
 ```text
-hotelReservasi/
+hotelReservasiDimas/
 ├── pom.xml                                   # File Konfigurasi Maven & Dependency
 └── src/
     └── main/
         ├── java/
-        │   └── com/muhammadrido/hotelreservasi/
+        │   └── com/dimasmulyo/hotelreservasi/
         │       ├── HotelReservasiApplication.java # Entry Point Aplikasi
         │       ├── controller/
         │       │   └── ReservasiController.java   # Controller HTTP Route
@@ -59,9 +59,9 @@ hotelReservasi/
 ## 🚀 Cara Import & Menjalankan di Apache NetBeans
 1. Buka **NetBeans IDE** Anda.
 2. Pilih menu **File** -> **Open Project**.
-3. Arahkan ke folder tempat Anda menaruh folder repositori ini dan pilih folder **`hotelReservasi`** (ikon project bertanda Maven/Spring Boot).
+3. Arahkan ke folder tempat Anda menaruh folder repositori ini dan pilih folder **`hotelReservasiDimas`** (ikon project bertanda Maven/Spring Boot).
 4. Jalankan aplikasi database local server Anda (seperti **XAMPP** / **MySQL**). Pastikan port database Anda adalah default `3306` dan password mysql kosong `""` (sesuai settingan di `application.properties`).
 5. Klik kanan pada project **hotel-reservasi** di NetBeans, lalu pilih **Run** (atau klik tombol **Play/Run** di toolbar NetBeans).
-6. NetBeans akan otomatis mengunduh dependency Maven yang diperlukan dan membuat database bernama `hotel_reservasi` secara otomatis.
+6. NetBeans akan otomatis mengunduh dependency Maven yang diperlukan dan membuat database bernama `hotel_reservasi_dimas` secara otomatis.
 7. Setelah log konsol menampilkan kata `Aplikasi Reservasi Hotel Berhasil Jalan!`, buka browser dan akses:
    👉 **http://localhost:8080**

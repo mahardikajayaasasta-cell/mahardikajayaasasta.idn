@@ -1,4 +1,4 @@
-package com.ahmadzidan.hotelreservasi.exception;
+package com.muhammadrido.hotelreservasi.exception;
 
 /**
  * Custom Exception: ReservasiNotFoundException

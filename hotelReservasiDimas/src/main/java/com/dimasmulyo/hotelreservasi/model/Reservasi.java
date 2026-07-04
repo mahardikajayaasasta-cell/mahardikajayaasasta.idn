@@ -1,4 +1,4 @@
-package com.ahmadzidan.hotelreservasi.model;
+package com.dimasmulyo.hotelreservasi.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -8,7 +8,8 @@ import java.time.LocalDate;
 /**
  * Class POJO/Entity: Reservasi
  * Merepresentasikan data reservasi kamar hotel
- * Menerapkan konsep OOP: Encapsulation, Constructor Overloading, toString Override
+ * Menerapkan konsep OOP: Encapsulation, Constructor Overloading, toString
+ * Override
  * Atribut: id, namaTamu, tipeKamar, tanggalCheckIn, tanggalCheckOut
  */
 @Entity

@@ -11,15 +11,15 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.muhammadrido</groupId>
+    <groupId>com.dimasmulyo</groupId>
     <artifactId>hotel-reservasi</artifactId>
     <version>1.0.0</version>
     <name>Hotel Reservasi</name>
-    <description>Aplikasi Reservasi Hotel - Tugas Pemrograman 2 Muhammad Rido</description>
+    <description>Aplikasi Reservasi Hotel - Tugas Pemrograman 2 Dimas Mulyo</description>
 
     <properties>
         <java.version>21</java.version>
-        <start-class>com.muhammadrido.hotelreservasi.HotelReservasiApplication</start-class>
+        <start-class>com.dimasmulyo.hotelreservasi.HotelReservasiApplication</start-class>
     </properties>
 
     <dependencies>

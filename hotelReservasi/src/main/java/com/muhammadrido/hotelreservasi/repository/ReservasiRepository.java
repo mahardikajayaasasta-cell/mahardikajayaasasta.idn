@@ -1,6 +1,6 @@
-package com.ahmadzidan.hotelreservasi.repository;
+package com.muhammadrido.hotelreservasi.repository;
 
-import com.ahmadzidan.hotelreservasi.model.Reservasi;
+import com.muhammadrido.hotelreservasi.model.Reservasi;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

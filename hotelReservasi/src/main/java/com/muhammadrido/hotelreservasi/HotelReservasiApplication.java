@@ -15,7 +15,7 @@ public class HotelReservasiApplication {
         SpringApplication.run(HotelReservasiApplication.class, args);
         System.out.println("===========================================");
         System.out.println("  Aplikasi Reservasi Hotel Berhasil Jalan!");
-        System.out.println("  Akses: http://localhost:8080");
+        System.out.println("  Akses: http://localhost:8081");
         System.out.println("===========================================");
     }
 }

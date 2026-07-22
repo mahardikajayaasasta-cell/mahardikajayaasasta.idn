@@ -14,7 +14,7 @@ jobs:
         run: |
           echo "Pinging Vercel to keep it awake..."
           
-          VERCEL_URL="https://mahardikajayaasasta-idn.vercel.app"
+          VERCEL_URL="https://mahardikajayaasasta-idn.vercel.app/api/ping-db"
           
           echo "Menghubungi URL: $VERCEL_URL"
           

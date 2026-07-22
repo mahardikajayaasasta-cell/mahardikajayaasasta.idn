@@ -164,3 +164,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
 });
 
+// =============================================
+// Keep-Alive Ping (Mencegah Database Tertidur / Lag Saat Login)
+// =============================================
+Route::get('/api/ping-db', function () {
+    try {
+        // Eksekusi query sederhana untuk memastikan database tetap aktif
+        \Illuminate\Support\Facades\DB::select('SELECT 1');
+        return response()->json(['status' => 'ok', 'message' => 'Database is awake.']);
+    } catch (\Exception $e) {
+        return response()->json(['status' => 'error', 'message' => 'DB Sleep: ' . $e->getMessage()], 500);
+    }
+});

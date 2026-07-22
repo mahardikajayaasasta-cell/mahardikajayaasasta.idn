@@ -6,52 +6,17 @@ use App\Models\User;
 use App\Models\Location;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // 1. Lokasi Utama: Kantor MJA (Dilakukan pertama agar Karyawan bisa terhubung ke lokasi ini)
         try {
-            // Admin
-            User::updateOrCreate(
-                ['email' => 'admin@absensi.app'],
-                [
-                    'name'        => 'Admin Sistem',
-                    'password'    => Hash::make('password'),
-                    'role'        => 'admin',
-                    'employee_id' => 'ADM001',
-                    'department'  => 'IT',
-                    'position'    => 'Pimpinan/Administrator',
-                    'is_active'   => true,
-                ]
-            );
-        } catch (\Exception $e) {}
-
-        try {
-            // Sample Karyawan Asli
-            User::updateOrCreate(
-                ['email' => 'karyawan@absensi.app'],
-                [
-                    'name'        => 'Budi Ahmad (Karyawan Tes)',
-                    'password'    => Hash::make('password'),
-                    'role'        => 'karyawan',
-                    'employee_id' => 'KRY001',
-                    'department'  => 'Operasional',
-                    'position'    => 'Staff',
-                    'phone'       => '08123456789',
-                    'is_active'   => true,
-                ]
-            );
-        } catch (\Exception $e) {}
-
-        try {
-            // Lokasi Utama: Kantor MJA Baru
             Location::updateOrCreate(
                 ['name' => 'Kantor MJA (Pondok Kacang)'],
                 [
                     'address'    => 'Jl. Pd. Kacang Raya No.14B, Pondok Kacang Barat, Kec. Pondok Aren, Kota Tangerang Selatan',
-                    // Koordinat pendekatan daerah Pondok Kacang Barat
                     'latitude'   => -6.265000, 
                     'longitude'  => 106.716000, 
                     'radius'     => 150,       
@@ -63,6 +28,86 @@ class DatabaseSeeder extends Seeder
             );
         } catch (\Exception $e) {}
 
-        // TIDAK ADA LAGI DUMMY DATA KEHADIRAN / MANUSIA LAINNYA.
+        // Mengambil ID Lokasi Kantor MJA untuk karyawan
+        $kantorMJA = Location::where('name', 'Kantor MJA (Pondok Kacang)')->first();
+        $locationId = $kantorMJA ? $kantorMJA->id : null;
+
+        // 2. Data Karyawan MJA
+        try {
+            // 1. DIREKTUR : NADYA AN NUURA
+            User::updateOrCreate(
+                ['email' => 'nadya@absensi.app'],
+                [
+                    'name'        => 'Nadya An Nuura',
+                    'password'    => Hash::make('password'),
+                    'role'        => 'admin', // Direktur = Admin agar bisa lihat semua rekap
+                    'employee_id' => 'MJA-01',
+                    'department'  => 'Manajemen',
+                    'position'    => 'Direktur',
+                    'location_id' => $locationId,
+                    'is_active'   => true,
+                ]
+            );
+
+            // 2. ADMIN KEUANGAN : INDRIYANI
+            User::updateOrCreate(
+                ['email' => 'indriyani@absensi.app'],
+                [
+                    'name'        => 'Indriyani',
+                    'password'    => Hash::make('password'),
+                    'role'        => 'admin', // Admin Keuangan = Admin
+                    'employee_id' => 'MJA-02',
+                    'department'  => 'Keuangan',
+                    'position'    => 'Admin Keuangan',
+                    'location_id' => $locationId,
+                    'is_active'   => true,
+                ]
+            );
+
+            // 3. MARKETING ONLINE : VIRRA
+            User::updateOrCreate(
+                ['email' => 'virra@absensi.app'],
+                [
+                    'name'        => 'Virra',
+                    'password'    => Hash::make('password'),
+                    'role'        => 'karyawan', 
+                    'employee_id' => 'MJA-03',
+                    'department'  => 'Marketing',
+                    'position'    => 'Marketing Online',
+                    'location_id' => $locationId,
+                    'is_active'   => true,
+                ]
+            );
+
+            // 4. KURIR : AHMAD ZIDAN
+            User::updateOrCreate(
+                ['email' => 'zidan@absensi.app'],
+                [
+                    'name'        => 'Ahmad Zidan',
+                    'password'    => Hash::make('password'),
+                    'role'        => 'karyawan', 
+                    'employee_id' => 'MJA-04',
+                    'department'  => 'Operasional',
+                    'position'    => 'Kurir',
+                    'location_id' => $locationId,
+                    'is_active'   => true,
+                ]
+            );
+
+            // 5. KURIR : MISBAH
+            User::updateOrCreate(
+                ['email' => 'misbah@absensi.app'],
+                [
+                    'name'        => 'Misbah',
+                    'password'    => Hash::make('password'),
+                    'role'        => 'karyawan', 
+                    'employee_id' => 'MJA-05',
+                    'department'  => 'Operasional',
+                    'position'    => 'Kurir',
+                    'location_id' => $locationId,
+                    'is_active'   => true,
+                ]
+            );
+        } catch (\Exception $e) {}
     }
 }

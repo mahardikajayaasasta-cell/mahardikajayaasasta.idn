@@ -21,6 +21,16 @@ try {
     if (!\Illuminate\Support\Facades\Schema::hasTable('users')) {
         \Illuminate\Support\Facades\Artisan::call('migrate', ['--force' => true]);
         \Illuminate\Support\Facades\Artisan::call('db:seed', ['--force' => true]);
+    } else {
+        // Fallback: pastikan akun default yang ada di UI login benar-benar tersedia
+        \App\Models\User::updateOrCreate(
+            ['email' => 'admin@absensi.app'],
+            ['name' => 'Administrator', 'password' => \Illuminate\Support\Facades\Hash::make('password'), 'role' => 'admin', 'employee_id' => 'SYS-01', 'position' => 'Admin', 'is_active' => true]
+        );
+        \App\Models\User::updateOrCreate(
+            ['email' => 'budi@absensi.app'],
+            ['name' => 'Budi Santoso', 'password' => \Illuminate\Support\Facades\Hash::make('password'), 'role' => 'karyawan', 'employee_id' => 'SYS-02', 'position' => 'Staff', 'is_active' => true]
+        );
     }
 } catch (\Exception $e) {
     // Abaikan error saat booting
@@ -37,7 +47,7 @@ Route::get('/', function () {
 });
 
 // Auth routes (Laravel Breeze)
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
 
 // Debug routes removed for security.
 
@@ -60,8 +70,8 @@ Route::middleware(['auth', 'karyawan'])->prefix('karyawan')->name('karyawan.')->
         $user = Auth::user();
         $today = today();
         $attendance = $user->todayAttendance();
-        $locations = $user->location_id 
-            ? \App\Models\Location::where('id', $user->location_id)->get() 
+        $locations = $user->location_id
+            ? \App\Models\Location::where('id', $user->location_id)->get()
             : \App\Models\Location::active()->get();
         $recentHistory = \App\Models\Attendance::where('user_id', $user->id)
             ->orderBy('date', 'desc')->take(7)->get();
@@ -126,7 +136,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
             if ($locations->isNotEmpty() && $users->isNotEmpty()) {
                 foreach ($users as $u) {
                     $exists = \App\Models\Attendance::where('user_id', $u->id)->whereDate('date', $today)->exists();
-                    if ($exists) continue;
+                    if ($exists)
+                        continue;
 
                     $loc = $locations->random();
                     $isLate = rand(0, 100) > 80;

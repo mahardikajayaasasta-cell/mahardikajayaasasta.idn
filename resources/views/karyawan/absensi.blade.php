@@ -413,8 +413,12 @@ document.getElementById('btn-capture').addEventListener('click', () => {
     const video = document.getElementById('camera-video');
     const canvas = document.getElementById('camera-canvas');
     const ctx = canvas.getContext('2d');
-    canvas.width = video.videoWidth || 640;
-    canvas.height = video.videoHeight || 480;
+    const TARGET_WIDTH = 640;
+    const aspect = (video.videoWidth || 640) / (video.videoHeight || 480);
+    const targetHeight = Math.round(TARGET_WIDTH / aspect);
+
+    canvas.width = TARGET_WIDTH;
+    canvas.height = targetHeight;
     
     // 1. Gambar frame asli
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -446,7 +450,7 @@ document.getElementById('btn-capture').addEventListener('click', () => {
     ctx.fillText(`Lokasi : ${posisiTangkapan}`, 15, canvas.height - 15);
     // ==== Selesai: Pengamanan Watermark Validasi ====
 
-    capturedPhoto = canvas.toDataURL('image/jpeg', 0.85);
+    capturedPhoto = canvas.toDataURL('image/jpeg', 0.6); // Kompres kualitas 60%
     canvas.classList.remove('hidden');
     video.classList.add('hidden');
     document.getElementById('btn-capture').classList.add('hidden');

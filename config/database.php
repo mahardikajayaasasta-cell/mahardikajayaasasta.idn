@@ -57,15 +57,17 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA', (function() {
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA', (function () {
                     $paths = [
                         '/etc/ssl/certs/ca-certificates.crt', // Debian/Ubuntu/Alpine
                         '/etc/pki/tls/certs/ca-bundle.crt',   // AmazonLinux/CentOS
                         '/etc/ssl/ca-bundle.pem',             // SUSE
                         '/etc/ssl/cert.pem',                  // macOS
+                        base_path('storage/app/cacert.pem'),  // Windows local
                     ];
                     foreach ($paths as $path) {
-                        if (file_exists($path)) return $path;
+                        if (file_exists($path))
+                            return $path;
                     }
                     return null;
                 })()),
@@ -88,7 +90,7 @@ return [
             'prefix_indexes' => true,
             'strict' => true,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA', (function() {
+                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA', (function () {
                     $paths = [
                         '/etc/ssl/certs/ca-certificates.crt', // Debian/Ubuntu/Alpine
                         '/etc/pki/tls/certs/ca-bundle.crt',   // AmazonLinux/CentOS
@@ -96,7 +98,8 @@ return [
                         '/etc/ssl/cert.pem',                  // macOS
                     ];
                     foreach ($paths as $path) {
-                        if (file_exists($path)) return $path;
+                        if (file_exists($path))
+                            return $path;
                     }
                     return null;
                 })()),
@@ -169,7 +172,7 @@ return [
 
         'options' => [
             'cluster' => env('REDIS_CLUSTER', 'redis'),
-            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_').'_database_'),
+            'prefix' => env('REDIS_PREFIX', Str::slug(env('APP_NAME', 'laravel'), '_') . '_database_'),
             'persistent' => env('REDIS_PERSISTENT', false),
         ],
 

@@ -26,6 +26,28 @@ if (strpos($url, '/setup-db') !== false) {
     $_SERVER['SESSION_DRIVER'] = 'array';
 }
 
+// =============================================
+// SERVERLESS HARDENING (Mencegah Read-Only Error)
+// =============================================
+$tmpStoragePaths = [
+    '/tmp/storage/framework/views',
+    '/tmp/storage/framework/cache',
+    '/tmp/storage/framework/cache/data',
+    '/tmp/storage/app'
+];
+
+foreach ($tmpStoragePaths as $tmpPath) {
+    if (!is_dir($tmpPath)) {
+        mkdir($tmpPath, 0755, true);
+    }
+}
+
+// Redirect internal storage ke /tmp serverless agar tidak crash Permission Denied
+putenv('VIEW_COMPILED_PATH=/tmp/storage/framework/views');
+$_ENV['VIEW_COMPILED_PATH'] = '/tmp/storage/framework/views';
+putenv('CACHE_STORE=array'); // Pakai array agar tidak nyimpan file sampah di serverless
+$_ENV['CACHE_STORE'] = 'array';
+
 $publicPath = __DIR__ . '/../public';
 $filePath = $publicPath . parse_url($url, PHP_URL_PATH);
 

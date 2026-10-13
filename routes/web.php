@@ -207,12 +207,29 @@ Route::get('/api/debug-dashboard', function () {
         $results['attendance_count'] = \App\Models\Attendance::count();
         $results['location_count'] = \App\Models\Location::count();
 
-        // 3. Check session driver
+        // 3. Check session/config
         $results['session_driver'] = config('session.driver');
         $results['db_connection'] = config('database.default');
         $results['app_debug'] = config('app.debug');
         $results['vercel'] = isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL_URL']);
         $results['storage_path'] = storage_path();
+
+        // 4. Try rendering the actual dashboard view
+        $today = today();
+        $stats = [
+            'total_karyawan' => \App\Models\User::where('role', 'karyawan')->where('is_active', true)->count(),
+            'hadir_hari_ini' => \App\Models\Attendance::whereDate('date', $today)->where('status', 'Hadir')->count(),
+            'telat_hari_ini' => \App\Models\Attendance::whereDate('date', $today)->where('status', 'Telat')->count(),
+            'mangkir_hari_ini' => \App\Models\Attendance::whereDate('date', $today)->where('status', 'Mangkir')->count(),
+            'belum_absen' => 0,
+        ];
+        $recentAttendances = collect([]);
+        $allTodayAttendances = collect([]);
+        $locations = \App\Models\Location::where('is_active', true)->get();
+
+        $html = view('admin.dashboard', compact('stats', 'recentAttendances', 'allTodayAttendances', 'locations', 'today'))->render();
+        $results['view_rendered'] = true;
+        $results['view_length'] = strlen($html);
 
         return response()->json(['status' => 'ok', 'results' => $results]);
     } catch (\Exception $e) {

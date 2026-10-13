@@ -9,7 +9,7 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Carbon;
 
-class LeaveController
+class LeaveController extends Controller
 {
     public function index()
     {
@@ -17,7 +17,7 @@ class LeaveController
         $leaves = Leave::where('user_id', $user->id)
             ->orderBy('date', 'desc')
             ->paginate(10);
-            
+
         // Hitung kuota cuti tahunan (Maksimal 12 Hari)
         $currentYear = now()->year;
         $usedCuti = Leave::where('user_id', $user->id)
@@ -26,9 +26,9 @@ class LeaveController
             ->whereYear('date', $currentYear)
             ->get()
             ->sum('duration');
-            
+
         $remainingCuti = max(0, 12 - $usedCuti);
-            
+
         return view('karyawan.izin.index', compact('leaves', 'user', 'usedCuti', 'remainingCuti'));
     }
 
@@ -70,14 +70,14 @@ class LeaveController
 
             // 2. Validasi Tumpang Tindih Tanggal (Overlap Check)
             $overlap = Leave::where('user_id', $user->id)
-                ->where(function($q) use ($startDate, $endDate) {
-                    $q->where(function($sub) use ($startDate, $endDate) {
+                ->where(function ($q) use ($startDate, $endDate) {
+                    $q->where(function ($sub) use ($startDate, $endDate) {
                         $sub->whereRaw('date <= ?', [$endDate->format('Y-m-d')])
-                           ->whereRaw('COALESCE(end_date, date) >= ?', [$startDate->format('Y-m-d')]);
+                            ->whereRaw('COALESCE(end_date, date) >= ?', [$startDate->format('Y-m-d')]);
                     });
                 })
                 ->exists();
-                
+
             if ($overlap) {
                 return back()->withErrors(['date' => 'Anda sudah memiliki pengajuan izin/sakit/cuti yang aktif pada tanggal atau rentang tanggal tersebut.'])->withInput();
             }
@@ -107,7 +107,7 @@ class LeaveController
                     ->whereYear('date', $year)
                     ->get()
                     ->sum('duration');
-                    
+
                 if ($usedCutiCount + $duration > 12) {
                     $sisa = max(0, 12 - $usedCutiCount);
                     return back()->withErrors(['type' => "Batas jatah cuti tahunan Anda untuk tahun {$year} tidak mencukupi (Maksimal 12 hari per tahun. Cuti terpakai/pending: {$usedCutiCount} hari, sisa kuota: {$sisa} hari, durasi yang diajukan: {$duration} hari)."])->withInput();

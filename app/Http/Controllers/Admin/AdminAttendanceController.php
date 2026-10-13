@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Carbon;
 
-class AdminAttendanceController
+class AdminAttendanceController extends Controller
 {
     /**
      * Dashboard Admin
@@ -54,9 +54,9 @@ class AdminAttendanceController
         // Default menampilkan data dari awal bulan (atau minimum 14 hari terakhir) hingga hari ini
         $defaultDateFrom = today()->subDays(14)->format('Y-m-d');
         $dateFrom = $request->get('date_from', $defaultDateFrom);
-        $dateTo   = $request->get('date_to', today()->format('Y-m-d'));
-        $status   = $request->get('status', '');
-        $userId   = $request->get('user_id', '');
+        $dateTo = $request->get('date_to', today()->format('Y-m-d'));
+        $status = $request->get('status', '');
+        $userId = $request->get('user_id', '');
 
         $query = Attendance::with(['user', 'location'])
             ->whereBetween('date', [$dateFrom, $dateTo])
@@ -84,8 +84,8 @@ class AdminAttendanceController
     {
         $defaultDateFrom = today()->subDays(14)->format('Y-m-d');
         $dateFrom = $request->get('date_from', $defaultDateFrom);
-        $dateTo   = $request->get('date_to', today()->format('Y-m-d'));
-        $userId   = $request->get('user_id', null);
+        $dateTo = $request->get('date_to', today()->format('Y-m-d'));
+        $userId = $request->get('user_id', null);
 
         $fileName = "rekap-absensi_{$dateFrom}_sd_{$dateTo}.xlsx";
 
@@ -102,8 +102,8 @@ class AdminAttendanceController
     {
         $defaultDateFrom = today()->subDays(14)->format('Y-m-d');
         $dateFrom = $request->get('date_from', $defaultDateFrom);
-        $dateTo   = $request->get('date_to', today()->format('Y-m-d'));
-        $userId   = $request->get('user_id', null);
+        $dateTo = $request->get('date_to', today()->format('Y-m-d'));
+        $userId = $request->get('user_id', null);
 
         $query = Attendance::with(['user', 'location'])
             ->whereBetween('date', [$dateFrom, $dateTo])
@@ -117,9 +117,9 @@ class AdminAttendanceController
 
         $pdf = Pdf::loadView('admin.pdf.rekap-absensi', [
             'attendances' => $attendances,
-            'dateFrom'    => $dateFrom,
-            'dateTo'      => $dateTo,
-            'printedAt'   => now()->format('d/m/Y H:i'),
+            'dateFrom' => $dateFrom,
+            'dateTo' => $dateTo,
+            'printedAt' => now()->format('d/m/Y H:i'),
         ]);
 
         $pdf->setPaper('A4', 'landscape');
@@ -143,12 +143,12 @@ class AdminAttendanceController
     {
         $request->validate([
             'status' => 'required|in:Hadir,Telat,Mangkir',
-            'notes'  => 'nullable|string|max:500',
+            'notes' => 'nullable|string|max:500',
         ]);
 
         $attendance->update([
             'status' => $request->status,
-            'notes'  => $request->notes,
+            'notes' => $request->notes,
         ]);
 
         return back()->with('success', 'Status absensi berhasil diperbarui.');

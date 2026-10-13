@@ -8,7 +8,7 @@ use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 
-class KaryawanProfileController
+class KaryawanProfileController extends Controller
 {
     public function edit()
     {
@@ -20,7 +20,7 @@ class KaryawanProfileController
     {
         try {
             $user = auth()->user();
-            
+
             // Ensure we have the actual User model instance
             if (!$user instanceof User) {
                 $user = User::find($user->id);

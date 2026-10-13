@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 use Illuminate\Support\Carbon;
 
-class AttendanceController
+class AttendanceController extends Controller
 {
     /**
      * Halaman absensi karyawan
@@ -23,8 +23,8 @@ class AttendanceController
             ->whereDate('date', $today)
             ->first();
 
-        $locations = $user->location_id 
-            ? Location::where('id', $user->location_id)->get() 
+        $locations = $user->location_id
+            ? Location::where('id', $user->location_id)->get()
             : Location::active()->get();
 
         return view('karyawan.absensi', compact('attendance', 'locations', 'today'));
@@ -37,14 +37,14 @@ class AttendanceController
     {
         try {
             $request->validate([
-                'latitude'    => 'required|numeric|between:-90,90',
-                'longitude'   => 'required|numeric|between:-180,180',
-                'photo'       => 'required|string',        // base64
+                'latitude' => 'required|numeric|between:-90,90',
+                'longitude' => 'required|numeric|between:-180,180',
+                'photo' => 'required|string',        // base64
                 'location_id' => 'required|exists:locations,id',
             ]);
 
-            $user     = Auth::user();
-            $today    = today();
+            $user = Auth::user();
+            $today = today();
 
             // Cek apakah user punya lokasi khusus yang ditentukan admin
             if ($user->location_id && $user->location_id != $request->location_id) {
@@ -79,8 +79,8 @@ class AttendanceController
             // Validasi: Tolak absen jika di luar radius lokasi kantor
             if (!$check['within']) {
                 return response()->json([
-                    'success'  => false,
-                    'message'  => "Anda berada di luar radius lokasi kerja. Jarak Anda: {$check['distance']} meter (maks {$location->radius}m).",
+                    'success' => false,
+                    'message' => "Anda berada di luar radius lokasi kerja. Jarak Anda: {$check['distance']} meter (maks {$location->radius}m).",
                     'distance' => $check['distance'],
                 ], 422);
             }
@@ -96,39 +96,41 @@ class AttendanceController
             }
 
             // Tentukan status (Hadir/Telat) berdasarkan jam server
-            $now       = now()->setTimezone('Asia/Jakarta');
-            
+            $now = now()->setTimezone('Asia/Jakarta');
+
             try {
                 $lateAfter = Carbon::parse($location->late_after)->setDate(
-                    $now->year, $now->month, $now->day
+                    $now->year,
+                    $now->month,
+                    $now->day
                 );
             } catch (\Exception $e) {
                 $lateAfter = $now->copy()->startOfDay()->addHours(8)->addMinutes(30);
             }
-            
+
             $status = $now->greaterThan($lateAfter) ? 'Telat' : 'Hadir';
 
             // Simpan atau update record
             $attendance = Attendance::updateOrCreate(
                 ['user_id' => $user->id, 'date' => $today],
                 [
-                    'location_id'        => $location->id,
-                    'clock_in'           => $now,
-                    'clock_in_latitude'  => $request->latitude,
+                    'location_id' => $location->id,
+                    'clock_in' => $now,
+                    'clock_in_latitude' => $request->latitude,
                     'clock_in_longitude' => $request->longitude,
-                    'clock_in_photo'     => $photoUrl,
-                    'clock_in_distance'  => $check['distance'],
-                    'status'             => $status,
+                    'clock_in_photo' => $photoUrl,
+                    'clock_in_distance' => $check['distance'],
+                    'status' => $status,
                 ]
             );
 
             return response()->json([
-                'success'    => true,
-                'message'    => "Absen masuk berhasil! Status: {$status}",
-                'status'     => $status,
-                'clock_in'   => $now->format('H:i:s'),
-                'distance'   => $check['distance'],
-                'photo_url'  => $photoUrl,
+                'success' => true,
+                'message' => "Absen masuk berhasil! Status: {$status}",
+                'status' => $status,
+                'clock_in' => $now->format('H:i:s'),
+                'distance' => $check['distance'],
+                'photo_url' => $photoUrl,
             ]);
         } catch (\Throwable $e) {
             \Log::error('CLOCK IN CRASH: ' . $e->getMessage());
@@ -145,13 +147,13 @@ class AttendanceController
     public function clockOut(Request $request)
     {
         $request->validate([
-            'latitude'    => 'required|numeric|between:-90,90',
-            'longitude'   => 'required|numeric|between:-180,180',
-            'photo'       => 'required|string',
+            'latitude' => 'required|numeric|between:-90,90',
+            'longitude' => 'required|numeric|between:-180,180',
+            'photo' => 'required|string',
             'location_id' => 'required|exists:locations,id',
         ]);
 
-        $user  = Auth::user();
+        $user = Auth::user();
         $today = today();
 
         // Cek apakah user punya lokasi khusus yang ditentukan admin
@@ -193,8 +195,8 @@ class AttendanceController
         // Validasi: Tolak absen pulang jika di luar radius lokasi kantor
         if (!$check['within']) {
             return response()->json([
-                'success'  => false,
-                'message'  => "Anda berada di luar radius lokasi kerja. Jarak Anda: {$check['distance']} meter (maks {$location->radius}m).",
+                'success' => false,
+                'message' => "Anda berada di luar radius lokasi kerja. Jarak Anda: {$check['distance']} meter (maks {$location->radius}m).",
                 'distance' => $check['distance'],
             ], 422);
         }
@@ -212,18 +214,18 @@ class AttendanceController
         $now = now()->setTimezone(config('app.timezone', 'Asia/Jakarta'));
 
         $attendance->update([
-            'clock_out'           => $now,
-            'clock_out_latitude'  => $request->latitude,
+            'clock_out' => $now,
+            'clock_out_latitude' => $request->latitude,
             'clock_out_longitude' => $request->longitude,
-            'clock_out_photo'     => $photoUrl,
-            'clock_out_distance'  => $check['distance'],
+            'clock_out_photo' => $photoUrl,
+            'clock_out_distance' => $check['distance'],
         ]);
 
         return response()->json([
-            'success'   => true,
-            'message'   => 'Absen pulang berhasil!',
+            'success' => true,
+            'message' => 'Absen pulang berhasil!',
             'clock_out' => $now->format('H:i:s'),
-            'distance'  => $check['distance'],
+            'distance' => $check['distance'],
             'photo_url' => $photoUrl,
         ]);
     }
@@ -236,7 +238,7 @@ class AttendanceController
         $user = Auth::user();
 
         $month = $request->get('month', now()->month);
-        $year  = $request->get('year', now()->year);
+        $year = $request->get('year', now()->year);
 
         $attendances = Attendance::where('user_id', $user->id)
             ->byMonth($year, $month)
@@ -244,8 +246,8 @@ class AttendanceController
             ->get();
 
         $stats = [
-            'hadir'  => $attendances->where('status', 'Hadir')->count(),
-            'telat'  => $attendances->where('status', 'Telat')->count(),
+            'hadir' => $attendances->where('status', 'Hadir')->count(),
+            'telat' => $attendances->where('status', 'Telat')->count(),
             'mangkir' => $attendances->where('status', 'Mangkir')->count(),
         ];
 
@@ -272,12 +274,12 @@ class AttendanceController
             // Mencoba upload ke Cloudinary
             try {
                 $result = Cloudinary::upload($base64Photo, [
-                    'folder'         => 'absensi/' . date('Y/m'),
-                    'public_id'      => "user_{$userId}_{$type}_" . time(),
+                    'folder' => 'absensi/' . date('Y/m'),
+                    'public_id' => "user_{$userId}_{$type}_" . time(),
                     'transformation' => [
-                        'width'   => 600, // Kecilkan ukuran agar hemat bandwith
+                        'width' => 600, // Kecilkan ukuran agar hemat bandwith
                         'quality' => 'auto',
-                        'format'  => 'webp',
+                        'format' => 'webp',
                     ],
                 ]);
                 return $result->getSecurePath();

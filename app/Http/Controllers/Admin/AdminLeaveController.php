@@ -8,21 +8,21 @@ use App\Models\Attendance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
-class AdminLeaveController
+class AdminLeaveController extends Controller
 {
     public function index(Request $request)
     {
         $status = $request->get('status', '');
-        
+
         $query = Leave::with(['user', 'verifier'])
             ->orderBy('created_at', 'desc');
-            
+
         if ($status) {
             $query->where('status', $status);
         }
-        
+
         $leaves = $query->paginate(15)->withQueryString();
-        
+
         return view('admin.izin.index', compact('leaves', 'status'));
     }
 
@@ -31,11 +31,11 @@ class AdminLeaveController
         try {
             $request->validate([
                 'status' => 'required|in:approved,rejected',
-                'notes'  => 'nullable|string|max:500',
+                'notes' => 'nullable|string|max:500',
             ]);
 
             $status = $request->status;
-            
+
             // Simpan status verifikasi
             $leave->update([
                 'status' => $status,
@@ -44,13 +44,13 @@ class AdminLeaveController
 
             $startDate = $leave->date;
             $endDate = $leave->end_date ?? $startDate;
-            
+
             if ($status === 'approved') {
                 // Loop through each day in the range and record attendance
                 $currentDate = $startDate->copy();
                 while ($currentDate->lte($endDate)) {
                     $dateStr = $currentDate->format('Y-m-d');
-                    
+
                     Attendance::updateOrCreate(
                         [
                             'user_id' => $leave->user_id,
@@ -61,7 +61,7 @@ class AdminLeaveController
                             'notes' => 'Pengajuan ' . ucfirst($leave->type) . ' disetujui Admin. Alasan: ' . $leave->reason,
                         ]
                     );
-                    
+
                     $currentDate->addDay();
                 }
             } else {
@@ -69,15 +69,15 @@ class AdminLeaveController
                 $currentDate = $startDate->copy();
                 while ($currentDate->lte($endDate)) {
                     $dateStr = $currentDate->format('Y-m-d');
-                    
+
                     $attendance = Attendance::where('user_id', $leave->user_id)
                         ->whereDate('date', $dateStr)
                         ->first();
-                        
+
                     if ($attendance && in_array($attendance->status, ['Izin', 'Sakit', 'Cuti'])) {
                         $attendance->delete();
                     }
-                    
+
                     $currentDate->addDay();
                 }
             }

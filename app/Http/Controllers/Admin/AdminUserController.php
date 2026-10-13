@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
-class AdminUserController
+class AdminUserController extends Controller
 {
     public function index()
     {
@@ -25,27 +25,27 @@ class AdminUserController
     public function store(Request $request)
     {
         $request->validate([
-            'name'        => 'required|string|max:255',
-            'email'       => 'required|email|unique:users',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
             'employee_id' => 'nullable|string|unique:users',
-            'department'  => 'nullable|string|max:100',
-            'position'    => 'nullable|string|max:100',
-            'phone'       => 'nullable|string|max:20',
+            'department' => 'nullable|string|max:100',
+            'position' => 'nullable|string|max:100',
+            'phone' => 'nullable|string|max:20',
             'location_id' => 'nullable|exists:locations,id',
-            'password'    => 'required|string|min:8|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         User::create([
-            'name'        => $request->name,
-            'email'       => $request->email,
+            'name' => $request->name,
+            'email' => $request->email,
             'employee_id' => $request->employee_id,
-            'department'  => $request->department,
-            'position'    => $request->position,
-            'phone'       => $request->phone,
+            'department' => $request->department,
+            'position' => $request->position,
+            'phone' => $request->phone,
             'location_id' => $request->location_id,
-            'role'        => 'karyawan',
-            'password'    => Hash::make($request->password),
-            'is_active'   => true,
+            'role' => 'karyawan',
+            'password' => Hash::make($request->password),
+            'is_active' => true,
         ]);
 
         return redirect()->route('admin.karyawan.index')
@@ -61,14 +61,14 @@ class AdminUserController
     public function update(Request $request, User $karyawan)
     {
         $request->validate([
-            'name'        => 'required|string|max:255',
-            'email'       => ['required', 'email', Rule::unique('users')->ignore($karyawan->id)],
+            'name' => 'required|string|max:255',
+            'email' => ['required', 'email', Rule::unique('users')->ignore($karyawan->id)],
             'employee_id' => ['nullable', 'string', Rule::unique('users')->ignore($karyawan->id)],
-            'department'  => 'nullable|string|max:100',
-            'position'    => 'nullable|string|max:100',
-            'phone'       => 'nullable|string|max:20',
+            'department' => 'nullable|string|max:100',
+            'position' => 'nullable|string|max:100',
+            'phone' => 'nullable|string|max:20',
             'location_id' => 'nullable|exists:locations,id',
-            'password'    => 'nullable|string|min:8|confirmed',
+            'password' => 'nullable|string|min:8|confirmed',
         ]);
 
         $data = $request->only(['name', 'email', 'employee_id', 'department', 'position', 'phone', 'location_id']);

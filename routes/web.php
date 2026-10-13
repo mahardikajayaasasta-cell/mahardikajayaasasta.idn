@@ -187,3 +187,41 @@ Route::get('/api/ping-db', function () {
         return response()->json(['status' => 'error', 'message' => 'DB Sleep: ' . $e->getMessage()], 500);
     }
 });
+
+// =============================================
+// TEMP DEBUG: Diagnosa dashboard error (hapus setelah fix)
+// =============================================
+Route::get('/api/debug-dashboard', function () {
+    try {
+        $results = [];
+
+        // 1. Check DB tables exist
+        $tables = ['users', 'attendances', 'locations', 'leaves', 'migrations'];
+        foreach ($tables as $table) {
+            $results['tables'][$table] = \Illuminate\Support\Facades\Schema::hasTable($table);
+        }
+
+        // 2. Try queries like dashboard does
+        $results['user_count'] = \App\Models\User::count();
+        $results['karyawan_count'] = \App\Models\User::where('role', 'karyawan')->where('is_active', true)->count();
+        $results['attendance_count'] = \App\Models\Attendance::count();
+        $results['location_count'] = \App\Models\Location::count();
+
+        // 3. Check session driver
+        $results['session_driver'] = config('session.driver');
+        $results['db_connection'] = config('database.default');
+        $results['app_debug'] = config('app.debug');
+        $results['vercel'] = isset($_SERVER['VERCEL']) || isset($_ENV['VERCEL_URL']);
+        $results['storage_path'] = storage_path();
+
+        return response()->json(['status' => 'ok', 'results' => $results]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'status' => 'error',
+            'message' => $e->getMessage(),
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+            'trace' => array_slice(explode("\n", $e->getTraceAsString()), 0, 15)
+        ], 500);
+    }
+});
